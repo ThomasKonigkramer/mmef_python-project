@@ -17,7 +17,8 @@ import os
 '''importing custom classes and modules'''
 import Customers
 import PaymentCards
-
+import Price
+import Discount
 ###################################################################################################
 '''
 database functions
@@ -472,7 +473,7 @@ if __name__ == '__main__':
     elif next_menu == 2:
         print('orders in progress')
     elif next_menu == 3:
-        print('oder history')
+        print('order history')
     elif next_menu == 4:
         print('add gift card/payment card')
     elif next_menu == 5:
