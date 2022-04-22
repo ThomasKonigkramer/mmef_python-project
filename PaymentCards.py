@@ -25,10 +25,12 @@ class PaymentCards(Customers.Customers):
         self.expiry_date = expiry_date
         self.card_balance = card_balance
 
+
     def __str__(self):
         bars = '----------------------------------------------------------------------------------------\n'
         summary_message = bars + f'User details:\nUser ID     : {self.user_id}\nUsername    : {self.username}\nFirst name  : {self.firstname}\nSurname     : {self.surname}\nCard number : {self.card_number}\nExpiry date : {self.expiry_date}\nCard balance: {self.card_balance}'
         return summary_message
+
 
     def set_card_number(self, number):
         if check_valid_number(number) == True:
@@ -36,11 +38,13 @@ class PaymentCards(Customers.Customers):
         else:
            return f'Card number provided not in a valid format: ####/####/####' 
 
+
     def set_expiry_date(self, date):
         if check_date_valid(date) == True:
             self.expiry_date = date
         else:
             return f'Date provided not in a valid format: dd/mm/yy'
+
 
     def set_card_balance(self, amount):
         if amount <= 0:
@@ -48,18 +52,18 @@ class PaymentCards(Customers.Customers):
         else:
             self.card_balance = amount
 
+
     def get_cardholder(self):
         cardholder_name = self.firstname + ' ' + self.surname
         return cardholder_name
 
-    
+
     def get_card_number(self):
         return {self.card_number}
 
+
     def get_expiry_date(self):
         return {self.expiry_date}
-    
-
 
 
     def withdraw(self, amount):
@@ -69,6 +73,7 @@ class PaymentCards(Customers.Customers):
         else:
             self.card_balance -= amount
             return self.card_balance
+
 
     def is_expired(self, today):
         # Card is expired and credited amounts are lost.
@@ -93,6 +98,7 @@ def check_date_valid(date):
     except ValueError:
         return False
 
+
 def check_valid_number(number):
     '''
     returns true or false depending on whether the card number provided is valid (true) or not (false)
@@ -102,6 +108,8 @@ def check_valid_number(number):
     else:
         return False
 
+###################################################################################################
+'''testing'''
 
 if __name__ == '__main__':
     card1 = PaymentCards('Alex', 'Tester', 'tester', '000000003', 'test')
