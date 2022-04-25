@@ -16,37 +16,37 @@ class From:
     def __str__(self):
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country:{self.country}, city:{self.city}' \
                f'Address:{self.address}, Code.__{self.code}'
-    def get_name(self):
+    def name(self):
         return self.name
     name = input('Name:')
     while len(name) == 0:
         name = input('please enter your Name:')
     if len(name) != 0:
         print(name)
-    def get_phonenumber(self):
+    def phonenumber(self):
      return self.phonenumber
     phonenumber = input('phonenumber:')
     if len(phonenumber) == 10:
        print(phonenumber)
     else:
         phonenumber = input('please enter the correct phonenumber:')
-    def get_country(self):
-        return self.country
+
+    def country(self):
+        if country == 'FRANCE':
+            return country
+        else:
+            return 'we do not suopport the service yet'
     country = input('country:')
     country = str.upper(country)
-    if country == 'FRANCE':
-        print(country)
-    else:
-        print('we do not suopport the service yet')
-    def get_city(self):
+    def city(self):
         return self.city
     city = input('city:')
     print(city)
-    def get_address(self, address):
+    def address(self, address):
         return self.address
     address = input('address:')
     print(address)
-    def get_code(self,code):
+    def code(self,code):
         return self.code
     code = input('code:')
     print(code)
@@ -67,14 +67,14 @@ class Destination:
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country:{self.country}, city:{self.city}' \
                f'Address:{self.address}, Code.__{self.code}'
 
-    def get_name(self):
+    def name(self):
         return self.name
     name = input('Name:')
     while len(name) == 0:
         name = input('please enter your Name:')
     if len(name) != 0:
         print(name)
-    def get_phonenumber(self):
+    def phonenumber(self):
         return self.phonenumber
     phonenumber = input('phonenumber(+0):')
     while len(phonenumber) != 10:
@@ -82,7 +82,7 @@ class Destination:
     if len(phonenumber) == 10:
         print(phonenumber)
 
-def get_country(country):
+def set_country(country):
     zone1 = ['FRANCE']
     zone2 = ['AUSTRIA, BELGIUM, BULGARIA, CROATIA, REPUBLIC OF CYPRUS, CZECH REPUBLIC, DENMARK, ESTONIA, FINLAND, GERMANY, GREECE, HUNGARY, IRELAND, ITALY, LATVIA, LITHUANIA, LUXEMBOURG, MALTA, NETHERLANDS, POLAND, PORTUGAL, ROMANIA, SLOVAKIA, SLOVENIA, SPAIN, SWEDEN']
     country = str.upper(country)
@@ -92,26 +92,14 @@ def get_country(country):
         return 'European'
     else:
         return 'International'
-country = input('country:')
-print(get_country(country))
-
-
-def get_city(self):
+def city(self):
     return self.city
 
-    city = input('city:')
-    print(city)
-
-def get_address(self, address):
+def address(self, address):
     return self.address
-    address = input('address:')
-    print(address)
 
-    def get_code(self, code):
+def code(self, code):
         return self.code
-
-    code = input('code:')
-    print(code)
 
 class Package:
     def __init__(self, weight, shippingmethod):
@@ -121,7 +109,7 @@ class Package:
     def __str__(self):
         return f'the weight is {self.weight}, the service is {self.service}'
 
-    def get_weight(self):
+    def weight(self):
         if weight <= 1:
             return ('small')
         elif weight > 1 and weight <= 3:
@@ -130,9 +118,8 @@ class Package:
             return ('big')
         elif weight >= 10:
             return ('it is too big to delivery')
-    weight = input('weight:')
-    weight = int(weight)
-def get_shippingmethod(self):
+
+def shippingmethod(self):
     if shippingmethod == 1:
         return 'Priority'
     elif shippingmethod == 2:
@@ -140,17 +127,6 @@ def get_shippingmethod(self):
     else:
         shippingmethod == 3
         return 'Standard'
-shippingmethod = input('please choose( 1:Priority 2:Express 3:Standard):')
-shippingmethod = int(shippingmethod)
-#
-
-
-
-
-
-
-
-
 
 
 
