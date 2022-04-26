@@ -13,12 +13,14 @@ authors:        Thomas Konigkramer
 import pandas as pd
 import getpass
 import os
+from datetime import datetime
 
 '''importing custom classes and modules'''
 import Customers
 import PaymentCards
-import Price
-import Discount
+# import Price
+# import Discount
+
 ###################################################################################################
 '''
 database functions
@@ -109,6 +111,13 @@ def call_customer_from_db(identifier, use_username = True):
 
     return customer
 
+# call_customer_from_db('jimmy')
+
+def in_db(instance, db):
+    '''
+    checks whether an instance has been added to a database, using a unique identifier
+    returns true (1) or false (0)
+    '''
 
 def modify_db(instance, db):
     '''
@@ -119,7 +128,7 @@ def modify_db(instance, db):
     if db == 'customers':
         customers_dir = get_dbdirectory(db)
         df = get_dbasdf(db)
-        customer_details = customer.get_detailslist()
+        customer_details = instance.get_detailslist()
         column_names = list(df)
         df_newcustomer = pd.DataFrame([customer_details], columns = column_names)
         df = pd.concat([df, df_newcustomer], ignore_index = False)
@@ -131,8 +140,7 @@ def modify_db(instance, db):
         # else - i.e. doesn't exist - then add
 
 
-# customer = Customers.Customers('Alex', 'Tester', 'tester', '000000003', 'test')
-# modify_db(customer, 'customers')
+
 ###################################################################################################
 '''
 printing/formating functions
@@ -179,8 +187,9 @@ def print_customer_menu():
     print('1 -- Place a new order')
     print('2 -- View orders in progress')
     print('3 -- View order history')
-    print('4 -- View my gift card balance')
-    print('5 -- Return to previous menu')
+    print('4 -- View my gift-card/payment-card balances')
+    print('5 -- Add gift-card or payment-card')
+    print('6 -- Exit')
     print_bars()
 
 ###################################################################################################
@@ -230,10 +239,11 @@ def option_menu(menu):
                         action()
         else:
             print_bars()
-            print(f'Invalid option. Please enter a number between 1 and {no_options}.')
+            print(f'Invalid option. Please enter a number between 1 and {no_options-1}.')
 
 
-def info_prompt_check(request, requests = [], is_signup = True, back_to = ''):
+def info_prompt_check(request, requests = [], is_signup = True):
+    # def info_prompt_check(request, requests = [], is_signup = True, back_to = ''):
     '''
     function to receive new information, check against database, and return to previous menu
     parameters: request - information requested from user
@@ -261,18 +271,16 @@ def info_prompt_check(request, requests = [], is_signup = True, back_to = ''):
                 elif prompt in requests and count == 2:
                     print_bars()
                     print(f'{request} provided invalid. 3 attempts failed.')
-                    last_menu(back_to)
-                    exit() # added after below
+                    main() # added after below
                 else:
                     return prompt
             else:
-                if prompt in requests and count < 2:
+                if prompt in requests and count <= 2:
                     return prompt
-                elif count == 2:
+                elif prompt not in requests and count == 2:
                     print_bars()
                     print(f'{request} provided invalid. 3 attempts failed.')
-                    last_menu(back_to)
-                    exit()
+                    main()
                 else:
                     count += 1
                     print_bars()
@@ -283,7 +291,8 @@ def info_prompt_check(request, requests = [], is_signup = True, back_to = ''):
             return prompt
 
 
-def info_prompt_hidden(request, requests = [], back_to = ''):
+def info_prompt_hidden(request, requests = []):
+    # def info_prompt_hidden(request, requests = [], back_to = ''):
     '''
     function to receive hidden information from users, e.g. passwords
     parameters:     request - the information we require from the user
@@ -300,15 +309,14 @@ def info_prompt_hidden(request, requests = [], back_to = ''):
             print('Invalid information provided.')
         # check if list is not empty
         if requests:
-            if prompt == requests:
+            if prompt == requests and count <= 2:
                 print_bars()
                 print(f'{request} correct.')
                 return prompt
             elif count == 2:
                 print_bars()
                 print(f'{request} provided invalid. 3 attempts failed.')
-                last_menu(back_to)    
-                exit() # added
+                main() # added
             else:
                 count += 1
                 print_bars()
@@ -322,6 +330,25 @@ def info_prompt_hidden(request, requests = [], back_to = ''):
             else:
                 return prompt
 
+    
+def check_date_valid(date):
+    '''
+    returns true or false depending on whether the date provided is valid (true) or not (false)
+    '''
+    day, month, year = date.split('/')
+    try:
+        datetime(int(year), int(month), int(day))
+        return True
+    except ValueError:
+        return False
+
+def check_paymentcard_valid(card_number):
+    '''
+    simply checking that does not already exist in db and that of correct form
+    '''
+
+
+# print(check_date_valid('09/14/22'))
 ###################################################################################################
 '''
 menu functions
@@ -375,18 +402,20 @@ def signin_menu():
     unique_identifier = option_menu(signin_menu_dic)
     if unique_identifier == 1:
         usernames = retrieve_list_from_db(df, 'Username')
-        username = info_prompt_check('Username', usernames, False, 'welcome')
+        username = info_prompt_check('Username', usernames, False)
+        # username = info_prompt_check('Username', usernames, False, 'signin')
         customer = call_customer_from_db(username)
     elif unique_identifier == 2:
         user_ids = retrieve_list_from_db(df, 'User_id')
-        user_id = info_prompt_check('User_id', user_ids, False, 'welcome')
+        user_id = info_prompt_check('User_id', user_ids, False)
+        # user_id = info_prompt_check('User_id', user_ids, False, 'signin')
         customer = call_customer_from_db(user_id, False)
         username = customer.get_username()
     
     check_password = customer.get_password()
 
-    password = info_prompt_hidden('Password', check_password, 'welcome')
-
+    password = info_prompt_hidden('Password', check_password)
+    # password = info_prompt_hidden('Password', check_password, 'welcome')
     print_bars()
     print(f'Welcome back, {username} !')
     print(customer)
@@ -403,7 +432,8 @@ def signup_menu():
     usernames = retrieve_list_from_db(df, 'Username')
     firstname = info_prompt_check('Name')
     surname = info_prompt_check('Surname')
-    username = info_prompt_check('Username', usernames, True, 'welcome')
+    username = info_prompt_check('Username', usernames, True)
+    # username = info_prompt_check('Username', usernames, True, 'welcome')
     password = info_prompt_hidden('Password')
  
     user_ids = retrieve_list_from_db(df, 'User_id')
@@ -426,47 +456,40 @@ def signup_menu():
     return customer
 
 
-def new_paymentcard():
-    print('')
+def new_paymentcard(customer):
+    '''
+    returns list of paymentcard instances
+    '''
+    # while card_number not 
+    #     card_number = 
+    # while expiry_date
+    #     expiry_date = 
+    # card_balance = 0
+    # while type(card_balance) <= int:
+    #     card_balance = 
 
 
-def display_paymentcards():
-    print('')
 
+def customer_menu(customer):
+    '''
+    customer menu steps: ask what user wants to do
+    returns order instance or displays requested information
+    '''
 
-def use_paymentcard():
-    print('')
+    customer_menu_dic = {
+    0 : print_customer_menu,
+    1 : [1], # new order
+    2 : [2], # orders in progress
+    3 : [3], # order history
+    4 : [4], # view payment cards
+    5 : [5], # add gift card/payment card
+    6 : [print_bars, 
+        'Thank you for visiting the KMX Shipping Platfrom. Enjoy your day.',
+        print_bars,
+        exit]
+    }
 
-
-def customer_menu():
-    print('')
-
-
-def last_menu(menu):
-    if menu == 'welcome':
-        print_bars()
-        print('Returning to Welcome Menu')
-        welcome_menu()
-    elif menu == 'signin':
-        print_bars()
-        print('Returning to Sign-in Menu')
-        signin_menu()
-    elif menu == 'signup':
-        print_bars()
-        print('Returning to Sign-up Menu')
-        signup_menu()
-    # elif payment:
-    elif menu == '':
-        print_bars()
-        print('Back to function called without adequate parameters set')
-        print_bars()    
-
-# signin_menu()
-###################################################################################################
-if __name__ == '__main__':
-    customer = welcome_menu()
-
-    next_menu = customer_menu()
+    next_menu = option_menu(customer_menu_dic)
 
     if next_menu == 1:
         print('new order')
@@ -478,5 +501,54 @@ if __name__ == '__main__':
         print('add gift card/payment card')
     elif next_menu == 5:
         print('view payment cards')
-    
+        
 
+def display_paymentcards(customer):
+    '''
+    returns list of paymentcard instances
+    '''
+    print('')
+
+
+def use_paymentcards(customer):
+    '''
+    returns list of paymentcard instances
+    '''
+    print('')
+
+# customer = Customers.Customers('Alex', 'Tester', 'tester', '000000003', 'test')
+
+def main():
+    customer = welcome_menu()
+
+    order = customer_menu(customer)
+
+    exit()
+
+
+# def last_menu(menu):
+#     if menu == 'welcome':
+#         print_bars()
+#         print('Returning to Welcome Menu')
+#         welcome_menu()
+#     elif menu == 'signin':
+#         print_bars()
+#         print('Returning to Sign-in Menu')
+#         signin_menu()
+#     elif menu == 'signup':
+#         print_bars()
+#         print('Returning to Sign-up Menu')
+#         signup_menu()
+#     # elif payment:
+#     elif menu == '':
+#         print_bars()
+#         print('Back to function called without adequate parameters set')
+#         print_bars()    
+#     elif menu == 'main':
+#         main()
+
+
+###################################################################################################    
+
+
+main()
