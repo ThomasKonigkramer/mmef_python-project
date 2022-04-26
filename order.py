@@ -17,39 +17,26 @@ class From:
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country:{self.country}, city:{self.city}' \
                f'Address:{self.address}, Code.__{self.code}'
     def name(self):
-        return self.name
-    name = input('Name:')
-    while len(name) == 0:
-        name = input('please enter your Name:')
-    if len(name) != 0:
-        print(name)
+        while len(name) == 0:
+            return False
+        if len(name) != 0:
+            return name
     def phonenumber(self):
-     return self.phonenumber
-    phonenumber = input('phonenumber:')
-    if len(phonenumber) == 10:
-       print(phonenumber)
-    else:
-        phonenumber = input('please enter the correct phonenumber:')
-
+        if len(phonenumber) == 10:
+            return phonenumber
+        else:
+            return False
     def country(self):
         if country == 'FRANCE':
             return country
         else:
             return 'we do not suopport the service yet'
-    country = input('country:')
-    country = str.upper(country)
     def city(self):
         return self.city
-    city = input('city:')
-    print(city)
     def address(self, address):
         return self.address
-    address = input('address:')
-    print(address)
     def code(self,code):
         return self.code
-    code = input('code:')
-    print(code)
 # example
 Sender1 = From('andy', 1234567890,'france','paris','qwert', 12345)
 print(Sender1)
@@ -68,19 +55,15 @@ class Destination:
                f'Address:{self.address}, Code.__{self.code}'
 
     def name(self):
-        return self.name
-    name = input('Name:')
-    while len(name) == 0:
-        name = input('please enter your Name:')
-    if len(name) != 0:
-        print(name)
+         while len(name) == 0:
+             return self.name
+         if len(name) != 0:
+             return False
     def phonenumber(self):
-        return self.phonenumber
-    phonenumber = input('phonenumber(+0):')
-    while len(phonenumber) != 10:
-        phonenumber = input('please enter the correct phonenumber:')
-    if len(phonenumber) == 10:
-        print(phonenumber)
+         while len(phonenumber) != 10:
+             return False
+         if len(phonenumber) == 10:
+            return self.phonenumber
 
 def set_country(country):
     zone1 = ['FRANCE']
@@ -127,7 +110,6 @@ def shippingmethod(self):
     else:
         shippingmethod == 3
         return 'Standard'
-
 
 
 
