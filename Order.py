@@ -85,33 +85,33 @@ def code(self, code):
         return self.code
 
 class Package:
-    def __init__(self, weight, shippingmethod):
+    def __init__(self, weight, shipping_method):
         self.weight = weight
-        self.service = service
+        self.shipping_method = shipping_method
 
     def __str__(self):
         return f'the weight is {self.weight}, the service is {self.service}'
 
     def weight(self):
-        if weight <= 1:
+        if self.weight <= 1:
             return ('small')
-        elif weight > 1 and weight <= 3:
+        elif self.weight > 1 and self.weight <= 3:
             return ('medium')
-        elif weight >= 4:
+        elif self.weight >= 4:
             return ('big')
-        elif weight >= 10:
+        elif self.weight >= 10:
             return ('it is too big to delivery')
-
-def shippingmethod(self):
-    if shippingmethod == 1:
-        return 'Priority'
-    elif shippingmethod == 2:
-        return 'Express'
-    else:
-        shippingmethod == 3
-        return 'Standard'
-
-
+#perhaps change to names directly
+    def shipping_method(self):
+        if shipping_method == 1:
+            return 'Priority'
+        elif shipping_method == 2:
+            return 'Express'
+        else:
+            shipping_method == 3
+            return 'Standard'
 
 
+user = Package(2,'Priority')
+print(user.shipping_method)
 
