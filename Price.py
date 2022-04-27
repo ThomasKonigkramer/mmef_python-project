@@ -7,14 +7,15 @@ Pricing Model - we use this to present the three shipping method price options a
 """
 
 #we have to pip install tabulate and enum using " python3 -m pip install tabulate and python3 -m pip install enum" in the terminal.
-from re import L
+#from re import L
 from tabulate import tabulate
 from enum import Enum
 
 
-# from order import Package
+# import Order class
 
-import Order
+from Order import Package
+from Order import Destination
 
 #converting order output to be clcompatible to price input
 
@@ -43,7 +44,7 @@ baseprice = 8.0
 
 
 
-class Price:
+class Price(Package,Destination):
 
     def __init__(self, shipping_method, shipping_destination, package_size, price, time):
         self.shipping_method = shipping_method
@@ -59,20 +60,20 @@ class Price:
     
     #based on Order destination| setting it to a numeric value to use in Price
     def shipping_destination(self):
-        if Order.Destination.set_country() == 'Domestic':
+        if Destination.set_country() == 'Domestic':
             self._shipping_destination = 1
-        elif Order.Destination.set_country() == 'Rest of EU':
+        elif Destination.set_country() == 'Rest of EU':
             self._shipping_destination = 1.25
-        elif Order.Destination.set_country() == 'International':
+        elif Destination.set_country() == 'International':
             self._shipping_destination = 2
     
     #based on Order Package | setting it to a numeric value to use in Price
     def package_size(self):
-        if Order.Package.package_size() == 'small':
+        if Package.package_size() == 'small':
             self._package_size = 1
-        elif Order.Package.package_size() == 'medium':
+        elif Package.package_size() == 'medium':
             self._package_size = 1.25
-        elif Order.Package.package_size() == 'big':
+        elif Package.package_size() == 'big':
             self._package_size = 2
             
     def set_price(self, shipping_meth):
