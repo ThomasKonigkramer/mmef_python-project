@@ -11,6 +11,13 @@ from tabulate import tabulate
 from enum import Enum
 
 
+# from order import Package
+
+
+#converting order output to be clcompatible to price input
+
+
+
 class ShippingDetail:
 
     shipping_method = ''
@@ -24,8 +31,8 @@ class ShippingDetail:
 
 
 priority = ShippingDetail('Priority', '1 day', 5)
-express = ShippingDetail('Express', '4 hours', 2.5)
-standard = ShippingDetail('Standard', '2-3 days', 0)
+express = ShippingDetail('Express', '2-3 days', 2.5)
+standard = ShippingDetail('Standard', '5-6 days', 0)
 
 
 baseprice = 8.0
@@ -34,38 +41,50 @@ baseprice = 8.0
 
 class Price:
 
-    def __init__(self, shipping_method, shipping_destination, package_size, distance_code, price):
+    def __init__(self, shipping_method, shipping_destination, package_size, distance_code, price, time):
         self.shipping_method = shipping_method
         self.shipping_destination = shipping_destination
         self.package_size = package_size
         self.distance_code = distance_code
         self.price = price
+        self.time = time
 
         #using setter method
 
         self._price = baseprice
+        self._time = '0 days'
 
     def set_price(self, shipping_meth):
          if shipping_meth == priority.shipping_method:
             self._price = baseprice + 5*self.shipping_destination + 2.5*self.package_size + 2.5*self.distance_code + priority.premium
-            return self._price
          elif shipping_meth == express.shipping_method:
             self._price =  baseprice + 5*self.shipping_destination + 2.5*self.package_size + 2.5*self.distance_code + express.premium
-            return self._price
          elif shipping_meth == standard.shipping_method:
             self._price = baseprice + 5*self.shipping_destination + 2.5*self.package_size + 2.5*self.distance_code
-            return self._price
-
+         return self._price
+        
+    def set_time(self, shipping_meth):
+        if shipping_meth == priority.shipping_method:
+            self._time = priority.shipping_time
+        elif shipping_meth == standard.shipping_method:
+            self._time = standard.shipping_time    
+        elif shipping_meth == express.shipping_method:
+            self._time = express.shipping_time
+        return self._time
+    
+    def get_time()
 
     def get_price_options(self):
         print("Your price options are :")
         print('')
-        return(tabulate([['Priority', '1 day', self.get_price(priority.shipping_method)], ['Express', '2-3 days', self.get_price(express.shipping_method)], ['Standard', '5-6 days', 19]], headers=['Service', 'Expected time', 'Price(€)']))
+        return(tabulate([['Priority', '1 day', self.set_price(priority.shipping_method)], ['Express', '2-3 days', self.set_price(express.shipping_method)], ['Standard', '5-6 days', self.set_price(standard.shipping_method)]], headers=['Service', 'Expected time', 'Price(€)']))
+
 
 """test"""
 
-user = Price("Express", 1, 1.5, 2, 0)
+user = Price("Standard", 1, 1.5, 2, 0, 0)
 
-print('\nYour recommended price is :', user.set_price(user.shipping_method), "€")
+
+print('\nYour price is ', user.set_price(user.shipping_method), "€ and you will get your delivery in ", user.set_time(user.shipping_method),"!Be there soon!")
 
 print(user.get_price_options())
