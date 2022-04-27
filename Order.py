@@ -64,43 +64,44 @@ class Destination:
              return False
          if len(phonenumber) == 10:
             return self.phonenumber
+    #check if this is ok, what is getting returned? change this to 
+    def set_country(self, country):
+        zone1 = ['FRANCE']
+        zone2 = ['AUSTRIA, BELGIUM, BULGARIA, CROATIA, REPUBLIC OF CYPRUS, CZECH REPUBLIC, DENMARK, ESTONIA, FINLAND, GERMANY, GREECE, HUNGARY, IRELAND, ITALY, LATVIA, LITHUANIA, LUXEMBOURG, MALTA, NETHERLANDS, POLAND, PORTUGAL, ROMANIA, SLOVAKIA, SLOVENIA, SPAIN, SWEDEN']
+        country = str.upper(country)
+        if country in zone1:
+            return 'Domestic'
+        elif country in zone2:
+            return 'Rest of EU'
+        else:
+            return 'International'
+        
+    def city(self):
+        return self.city
 
-def set_country(country):
-    zone1 = ['FRANCE']
-    zone2 = ['AUSTRIA, BELGIUM, BULGARIA, CROATIA, REPUBLIC OF CYPRUS, CZECH REPUBLIC, DENMARK, ESTONIA, FINLAND, GERMANY, GREECE, HUNGARY, IRELAND, ITALY, LATVIA, LITHUANIA, LUXEMBOURG, MALTA, NETHERLANDS, POLAND, PORTUGAL, ROMANIA, SLOVAKIA, SLOVENIA, SPAIN, SWEDEN']
-    country = str.upper(country)
-    if country in zone1:
-        return 'Domestic'
-    elif country in zone2:
-        return 'European'
-    else:
-        return 'International'
-def city(self):
-    return self.city
+    def address(self, address):
+        return self.address
 
-def address(self, address):
-    return self.address
-
-def code(self, code):
-        return self.code
+    def code(self, code):
+            return self.code
 
 class Package:
-    def __init__(self, weight, shipping_method):
-        self.weight = weight
+    def __init__(self, package_size, shipping_method):
+        self.package_size = package_size
         self.shipping_method = shipping_method
 
     def __str__(self):
-        return f'the weight is {self.weight}, the service is {self.service}'
+        return f'the package_size is {self.package_size}, the service is {self.shipping_method}'
 
-    def weight(self):
-        if self.weight <= 1:
+    def package_size(self):
+        if self.package_size <= 1:
             return ('small')
-        elif self.weight > 1 and self.weight <= 3:
+        elif self.package_size > 1 and self.package_size <= 3:
             return ('medium')
-        elif self.weight >= 4:
+        elif self.package_size >= 4:
             return ('big')
-        elif self.weight >= 10:
-            return ('it is too big to delivery')
+        elif self.package_size >= 10:
+            return ('Sorry! it is too big to deliver!')
 #perhaps change to names directly
     def shipping_method(self):
         if shipping_method == 1:
