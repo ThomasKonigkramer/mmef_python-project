@@ -8,6 +8,7 @@ Pricing Model - we use this to present the three shipping method price options a
 
 #we have to pip install tabulate and enum using " python3 -m pip install tabulate and python3 -m pip install enum" in the terminal.
 #from re import L
+
 from tabulate import tabulate
 from enum import Enum
 
@@ -22,10 +23,6 @@ from Order import Destination
 
 
 class ShippingDetail:
-
-    shipping_method = ''
-    shipping_time = ''
-    premium = 0.0
 
     def __init__(self,  shipping_method, shipping_time, premium):
         self.shipping_method = shipping_method
@@ -43,13 +40,12 @@ baseprice = 8.0
 """price pre discounts"""
 
 
-
 class Price(Package,Destination):
 
-    def __init__(self, shipping_method, shipping_destination, package_size, price, time):
-        self.shipping_method = shipping_method
-        self._shipping_destination = shipping_destination
-        self._package_size = package_size
+    def __init__(self, shipping_method, _shipping_destination, _package_size, price, time):
+        self._shipping_method = shipping_method
+        self._shipping_destination = _shipping_destination
+        self._package_size = _package_size
         self.price = price
         self.time = time
 
@@ -57,33 +53,37 @@ class Price(Package,Destination):
 
         self._price = baseprice
         self._time = '0 days'
-    
+        Package.__init__(self,_package_size, shipping_method)
+        Destination.__init__(self)
+        
     #based on Order destination| setting it to a numeric value to use in Price
     def shipping_destination(self):
-        if Destination.set_country() == 'Domestic':
+        if self.get_country(self.country) == 'Domestic':
             self._shipping_destination = 1
-        elif Destination.set_country() == 'Rest of EU':
+        elif self.get_country(self.country) == 'Rest of EU':
             self._shipping_destination = 1.25
-        elif Destination.set_country() == 'International':
+        elif self.get_country(self.country) == 'International':
             self._shipping_destination = 2
+        return self._shipping_destination
     
     #based on Order Package | setting it to a numeric value to use in Price
-    def package_size(self):
-        if Package.package_size() == 'small':
+    def packagesize(self):
+        if self.package_size() == 'small':
             self._package_size = 1
-        elif Package.package_size() == 'medium':
+        elif self.package_size() == 'medium':
             self._package_size = 1.25
-        elif Package.package_size() == 'big':
+        elif self.package_size() == 'big':
             self._package_size = 2
+        return self._package_size
             
     def set_price(self, shipping_meth):
          if shipping_meth == priority.shipping_method:
-            self._price = baseprice + 5*self.shipping_destination + 2.5*self.package_size + priority.premium
+            self.price = baseprice + 5*self.shipping_destination() + 2.5*self.packagesize() + priority.premium
          elif shipping_meth == express.shipping_method:
-            self._price =  baseprice + 5*self.shipping_destination + 2.5*self.package_size + express.premium
+            self.price =  baseprice + 5*self.shipping_destination() + 2.5*self.packagesize() + express.premium
          elif shipping_meth == standard.shipping_method:
-            self._price = baseprice + 5*self.shipping_destination + 2.5*self.package_size 
-         return self._price
+            self.price = baseprice + 5*self.shipping_destination() + 2.5*self.packagesize() + standard.premium
+         return self.price
         
     def set_time(self, shipping_meth):
         if shipping_meth == priority.shipping_method:
@@ -106,7 +106,7 @@ class Price(Package,Destination):
 """test"""
 
 user = Price("Standard", 1, 1.5, 2, 0)
-print(user.set_price(user.shipping_method))
-print('\nYour price is ', user.set_price(user.shipping_method), "€ and you will get your delivery in ", user.set_time(user.shipping_method),"!Be there soon!")
+print(user.set_price(user._shipping_method))
+print('\nYour price is ', user.set_price(user._shipping_method), "€ and you will get your delivery in ", user.set_time(user._shipping_method),"!Be there soon!")
 
 print(user.get_price_options())

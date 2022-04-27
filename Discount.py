@@ -6,43 +6,43 @@ author: Sukanya Mukherjee
 Discounts
 """
 
-import Price
+from Price import Price
 
-class Discount(Price.Price):
-    def __init__(self, price, discount, type, discountedamount, discountedprice):
+class Discount(Price):
+    def __init__(self, discount, type, discountamount, discountedprice, shipping_method, _shipping_destination, _package_size, price, time):
         
-        super().__init__(price)
+        Price.__init__(self, shipping_method, _shipping_destination, _package_size, price, time)
 
         self.discount = discount
         self.type = type
-        self.discountedamount = discountedamount
+        self.discountamount = discountamount
         self.discountedprice = discountedprice
+       
         
         
-
     def set_discounting(self):
-        if self.price < 20:
+        print('yeh', self.set_price(self._shipping_method)) 
+        if self.set_price(self._shipping_method) < 20:
            return ("Minimum purchase of 20€ required to avail discount") 
         else : 
             if self.discount == True and self.type == "%":
-                if self.discountedamount <10 :
-                    self.discountedprice = self.discountedprice*(1 - self.discountedamount)
+                if self.discountamount <10 :
+                    self.discountedprice = self.set_price(self._shipping_method)*(1 - self.discountamount/100)
                 else :
                     return("Sorry! That is an invalid discount")
             elif self.discount == True and self.type =="flat":
-                if self.discountedamount <5 :
-                    self.discountedprice = self.discountedprice - self.discountedamount
+                if self.discountamount <5 :
+                    self.discountedprice = self.set_price(self._shipping_method) - self.discountamount
                 else :
                     return("Sorry! That is an invalid discount")   
             else :
-                self.discountedprice = self.price
-        return("Congrats! Your new price is", self.discountedprice,". You have saved", self.price - self.discountedprice,".")
+                self.discountedprice = self.set_price(self._shipping_method)
+        return(f'Congrats! Your new price is {self.discountedprice:.2f}. You have saved {self.price - self.discountedprice:.2f}')
         
 """import from user menu"""
 
-user = Discount(5,True, "%",5,5)
-user.discountedprice
-
+user = Discount(True, "%",5,5,'Priority',2,2,0,0)
+print(user.set_discounting())
 
 
 
