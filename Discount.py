@@ -21,7 +21,6 @@ class Discount(Price):
         
         
     def set_discounting(self):
-        print('yeh', self.set_price(self._shipping_method)) 
         if self.set_price(self._shipping_method) < 20:
            return ("Minimum purchase of 20€ required to avail discount") 
         else : 
