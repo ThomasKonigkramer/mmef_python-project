@@ -32,6 +32,7 @@ database and custom classes functions
 
 '''retrieve database information'''
 
+
 def get_dbdirectory(db):
     '''
     db - customers or paymentcards
@@ -49,6 +50,7 @@ def get_dbdirectory(db):
     elif db == 'orders':
         orders_dir = db_dir + '\db_orders.csv'
         return orders_dir
+
 
 def get_dbasdf(db):
     '''
@@ -148,14 +150,6 @@ def call_paymentcards_from_db(customer):
     return paymentcards
 
 
-
-# paymentcards = call_paymentcards_from_db('jimmy')
-# for card in paymentcards:
-#     print(card)
-
-# call_customer_from_db('jimmy')
-
-
 def sort_paymentcards(customer):
     '''
     returns list of paymentcard instances
@@ -166,26 +160,15 @@ def sort_paymentcards(customer):
             paymentcards.remove(card)
         if card.get_card_balance() == 0:
             paymentcards.remove(card)
-
+   
     # for card in paymentcards:
     #     print(card.get_expiry_date())
     paymentcards.sort(key = lambda x: x.get_datetime_expiry())
     # for card in paymentcards:
     #     print(card.get_expiry_date())
-   
-    return paymentcards
     
+    return paymentcards
 
-
-
-customer = call_customer_from_db('jimmy')
-sort_paymentcards(customer)
-
-def in_db(instance, db):
-    '''
-    checks whether an instance has been added to a database, using a unique identifier
-    returns true (1) or false (0)
-    '''
 
 def modify_db(instance, db):
     '''
@@ -204,24 +187,23 @@ def modify_db(instance, db):
     
     elif db == 'paymentcards':
         card_numbers = retrieve_list_from_db(df, 'Card_number')
-        # print(card_numbers)
         card_details = instance.get_card_details()
+        
         if instance.get_card_number() in card_numbers:
-            # print(instance.get_card_number())
-            # df.replace(to_replace=)
-            # print(instance.get_card_balance())
             df.loc[df['Card_number']==instance.get_card_number(), 'Card_balance'] = instance.get_card_balance()
             df.to_csv(dir, index = False)
-            # df['Card_balance'] = df[df['Card_number']==instance.get_card_number()]['Card_balance']=instance.get_card_balance()
+        
         else:            
             df_newcard = pd.DataFrame([card_details], columns = column_names)
             df = pd.concat([df, df_newcard], ignore_index = False)
             df.to_csv(dir, index = False)
+    
     elif db == 'orders':
         order_details = instance.get_order_details_list()
         df_neworder = pd.DataFrame([order_details], columns = column_names)
         df = pd.concat([df, df_neworder], ignore_index = False)
         df.to_csv(dir, index = False)
+
 
 def find_max_id(id_list):
     '''
@@ -241,7 +223,6 @@ def find_max_id(id_list):
 '''
 printing/formating functions
 '''
-
 
 def print_bars():
     '''
@@ -302,6 +283,7 @@ def print_shipping_method():
     print('4 -- Return to main menu')
     print_bars()
 
+
 def print_discount_menu():
     '''
     printing function - is discount flat or percentage
@@ -311,6 +293,7 @@ def print_discount_menu():
     print('2 -- Flat discount')
     print('3 -- Return to main menu')
     print_bars()
+
 
 def print_payment_menu():
     '''
@@ -417,8 +400,7 @@ def info_prompt_check(request, requests = [], is_signup = True):
                     count += 1
                     print_bars()
                     print(f'{request} provided not valid - please try again.')
-                    # print(request)
-                    # print(requests)
+
         else:
             return prompt
 
@@ -785,17 +767,6 @@ def new_paymentcard(customer):
 
     return new_card
 
-# customer1 = call_customer_from_db('zo')
-# cards = sort_paymentcards(customer1)
-# cost = 7500
-
-# for card in cards:
-#     cost = card.withdraw(cost) 
-#     print(card) 
-#     modify_db(card, 'paymentcards')
-#     # print(cost) 
-
-# print(f'{cost} of the total cost remains to be paid in cash.')
 
 def payment(order):
     print_bars()
@@ -822,12 +793,15 @@ def payment(order):
         print_bars()
         print('You are paying by gift-card/payment-card')
         modify_db(order, 'orders')
+        customer = order.get_customer()
+        # print(customer)
         cards = sort_paymentcards(customer)
         cost = order.get_price() #order.discountprice
+        # print(cards)
 
         for card in cards:
             cost = card.withdraw(cost) 
-            # print(card) 
+            print(card) 
             modify_db(card, 'paymentcards')
         
         if cost > 0:
@@ -837,11 +811,6 @@ def payment(order):
             print_bars()
             print('Your gift-cards/payment-cards paid the entirety of the delivery cost.')
         # print(order)
-
-
-# customer1 = call_customer_from_db('jimmy')
-# order1 = new_order(customer1)
-# print(order1)
 
 
 def main():

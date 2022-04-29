@@ -109,11 +109,10 @@ def check_date_valid(date):
     '''
     returns true or false depending on whether the date provided is valid (true) or not (false)
     '''
-    if not re.search(r'\d{2}/\d{2}/\d{2}', date):
-        print(re.search(r'\d{2}/\d{2}/\d{2}', date))
-        return False
-    else:
+    if re.search(r'\d{2}/\d{2}/\d{2}', date) and len(date)==8:
         day, month, year = date.split('/')
+    else:
+        return False
     try:
         datetime(int(year), int(month), int(day))
         return True
@@ -139,12 +138,12 @@ if __name__ == '__main__':
     if expiry_set != None:
         print(expiry_set)
     balance_set = card1.set_card_balance(500)
-    if balance_set != None:
-        print(balance_set)
-    print(card1)
-    number_set = card1.set_card_number('1111/1111/1111')
-    if number_set != None:
-        print(number_set)
-    card1.withdraw(300)
+    # if balance_set != None:
+    #     print(balance_set)
+    # print(card1)
+    # number_set = card1.set_card_number('1111/1111/1111')
+    # if number_set != None:
+    #     print(number_set)
+    # card1.withdraw(300)
     print(card1)
 
