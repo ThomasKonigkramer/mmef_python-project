@@ -9,7 +9,7 @@ authors:        Thomas Konigkramer
 4 -- menues
 
 Version 1       User sign-in/sign-up; dynamic options menu; dynamic prompt menues; database set-up for customers and paymentcards
-Version 2       function:      
+Version 2       function: new_order(customer) function created, incorporating pieces from other group members
 """
 
 '''importing python packages'''
@@ -200,6 +200,8 @@ def modify_db(instance, db):
     
     elif db == 'orders':
         order_details = instance.get_order_details_list()
+        # print(order_details)
+        # print(column_names)
         df_neworder = pd.DataFrame([order_details], columns = column_names)
         df = pd.concat([df, df_neworder], ignore_index = False)
         df.to_csv(dir, index = False)
@@ -303,6 +305,18 @@ def print_payment_menu():
     print('This is the payment menu.')
     print('1 -- Pay by cash')
     print('2 -- Pay by gift-card/payment-card')
+    print('3 -- Cancel order and return to main menu')
+    print_bars()
+
+
+def print_preference_menu():
+    '''
+    printing function - delivery preference menu
+    '''
+    print_bars()
+    print('Would you like special home delivery for your order?')
+    print('1 -- Home delivery (additional 2 EUR fee)')
+    print('2 -- Depot delivery (no added fee)')
     print('3 -- Cancel order and return to main menu')
     print_bars()
 
@@ -723,11 +737,30 @@ def new_order(customer):
 
     df = get_dbasdf('orders')
 
-    tracking_ids = retrieve_list_from_db(df, 'Tracking_number')
+    # tracking_ids = retrieve_list_from_db(df, 'Tracking_number')
     # print(tracking_ids)
-    tracking_id = find_max_id(tracking_ids)
+    # tracking_id = find_max_id(tracking_ids)
 
-    order.set_tracking_id(tracking_id)
+    order.set_order_code()
+
+    delivery_preference_dir = {
+        0 : print_preference_menu,
+        1 : [1], # home
+        2 : [2], # depot
+        3 : [print_bars,
+        'Returning to Welcome menu.',
+        print_bars,
+        main]
+    }
+
+    preference = option_menu(delivery_preference_dir)
+
+    if preference == 1:
+        order.set_delivery_preference(1)
+    else:
+        order.set_delivery_preference(0)
+    
+    print(order)
 
     return order
 
@@ -744,8 +777,9 @@ def new_paymentcard(customer):
     password = customer.get_password()
 
     new_card = PaymentCards.PaymentCards(firstname, surname, username, user_id, password)
-
-    card_number = info_prompt_check('Card number')
+    df = get_dbasdf('paymentcards')
+    card_numbers = retrieve_list_from_db(df, 'Card_number')
+    card_number = info_prompt_check('Card number', card_numbers, True)
     while new_card.set_card_number(card_number) != None:
         print_bars()
         print(new_card.set_card_number(card_number))
@@ -810,7 +844,7 @@ def payment(order):
         else:
             print_bars()
             print('Your gift-cards/payment-cards paid the entirety of the delivery cost.')
-        # print(order)
+        print(order)
 
 
 def main():
@@ -828,22 +862,3 @@ def main():
 
 main()
 
-
-
-# customer1 = call_customer_from_db('jimmy')
-# sender1 = Order.From('Bob Davis', 'France')
-# # print(sender1.country)
-# receiver1 = Order.Destination('Charley Man', 'South Africa')
-# package1 = Order.Package(3,1)
-# # shipping_method_4th = 1/2/3
-# discount1 = Discount.Discount(True, 'flat', 5, package1.get_shipping_method(), receiver1.get_country(), package1.get_package_size(), 30, '1 day',29)
-# today = datetime.now().date().strftime("%d/%m/%y")
-# # print(today)
-
-# order1 = Order.Order(customer1, sender1, receiver1, package1, discount1, today, 3)
-
-# test = order1.get_order_details_list()
-# # print(test)
-
-# sender2 = order1.get_sender()
-# print(sender2.get_country())

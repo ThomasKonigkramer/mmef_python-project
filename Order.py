@@ -5,7 +5,7 @@
 # #first to get the distance of the delivery
 
 # print('where are you shipping from:')
-
+import time
 
 class From:
 
@@ -16,6 +16,7 @@ class From:
         self.city = city
         self.address = address
         self.code = code
+    
     def __str__(self):
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country: {self.country}, city: {self.city}, ' \
                f'Address: {self.address}, Code: {self.code}'
@@ -26,11 +27,6 @@ class From:
         else:
             self.name = name
 
-    def phonenumber(self):
-        if len(self.phonenumber) == 10:
-            return self.phonenumber
-        else:
-            return False
     # edit: changed name and parameters        
     def set_country(self, country):
         country = country.upper() # added
@@ -38,6 +34,13 @@ class From:
             self.country = country
         else:
             return 'We currently only support orders sent from France.'
+
+    def get_country(self):
+        return self.country
+
+    def get_name(self):
+        return self.name
+
     def city(self):
         return self.city
     def address(self, address):
@@ -45,11 +48,11 @@ class From:
     def code(self,code):
         return self.code
 
-    def get_country(self):
-        return self.country
-
-    def get_name(self):
-        return self.name
+    def phonenumber(self):
+        if len(self.phonenumber) == 10:
+            return self.phonenumber
+        else:
+            return False
 
 class Destination:
     def __init__(self, name = '', country = '', phonenumber = 0000000000, city = '-', address= '-', code='-'):
@@ -175,11 +178,20 @@ class Package:
 
 class Order:
 
-    def __init__(self, customer, price, date, tracking_id = 0):
+    def __init__(self, customer, price, date, delivery_preference = 0, tracking_id = 0):
         self.__customer = customer
         self.__price = price
         self.__date = date
+        self.__delivery_preference = delivery_preference
         self.__tracking_id = tracking_id
+
+    def get_delivery_preference(self):
+        return self.__delivery_preference
+
+    def set_delivery_preference(self, preference):
+        if preference == 1: # home delivery (0 default for depot delivery)
+            self.__price += 2
+        self.__delivery_preference = preference
 
     def get_customer(self):
         return self.__customer
@@ -193,68 +205,26 @@ class Order:
     def get_tracking_id(self):
         return self.__tracking_id
 
-    def set_tracking_id(self, id):
-        self.__tracking_id = id
+    def set_order_code(self):
+        #year/month/date/hour/minute/second+time.time and 7 more
+        order_no = str(time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())) + str(time.time()).replace('.', '')[-7:])
+        self.__tracking_id = order_no
+
+    def get_order_code(self):
+        return self.__tracking_id
 
     def get_order_details_list(self):
-        c1 = self.__customer.get_firstname()
-        c2 = self.__customer.get_surname()
         username = self.__customer.get_username()
-        c3 = self.__customer.get_userid()
-        c4 = self.__customer.get_password()
-        return [username, self.__price, self.__date, self.__tracking_id]
+        return [username, self.__price, self.__date, self.__delivery_preference, self.__tracking_id]
 
     # def get_delivery_date(self):
 
-    # def __str__(self):
+    def __str__(self):
+        return f'Your order has been completed. Tracking number: {self.__tracking_id}'
 
-'''
-to include all the information, setup order class as below
-a truncated version was made for the course
-'''    
-# class Order:
 
-#     def __init__(self, customer, sender, receiver, package, discount, date, tracking_id = 0):
-#         self.__customer = customer
-#         self.__sender = sender
-#         self.__receiver = receiver
-#         self.__package = package
-#         self.__discount = discount
-#         self.__date = date
-#         self.__tracking_id = tracking_id
-    
-#     def get_customer(self):
-#         return self.__customer
 
-#     def get_sender(self):
-#         return self.__sender
-    
-#     def get_receiver(self):
-#         return self.__receiver
 
-#     def get_package(self):
-#         return self.__package
-    
-#     def get_discount(self):
-#         return self.__discount
-    
-#     def get_date(self):
-#         return self.__date
-    
-#     def get_tracking_id(self):
-#         return self.__tracking_id
-
-#     def set_tracking_number(self, id):
-#         self.__tracking_id = id
-
-#     def get_order_details_list(self):
-#         x1 = self.__sender.get_name()
-#         x2 = self.__sender.get_country()
-#         x3 = self.__receiver.get_name()
-#         x4 = self.__receiver.get_country()
-#         # x5 = 
-#         return [x1, x2, x3]
-    
 
 #test sukanya
 if __name__ == '__main__':
