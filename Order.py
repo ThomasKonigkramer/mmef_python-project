@@ -6,7 +6,6 @@
 
 # print('where are you shipping from:')
 import time
-
 class From:
 
     def __init__(self, name = '', country = '', phonenumber = 0000000000, city = '-', address= '-', code='-'):
@@ -41,14 +40,14 @@ class From:
     def get_name(self):
         return self.name
 
-    def city(self):
+    def set_city(self):
         return self.city
-    def address(self, address):
+    def set_address(self, address):
         return self.address
-    def code(self,code):
+    def set_code(self,code):
         return self.code
 
-    def phonenumber(self):
+    def set_phonenumber(self):
         if len(self.phonenumber) == 10:
             return self.phonenumber
         else:
@@ -91,24 +90,72 @@ class Destination:
     def get_country_zone(self, country):
         zone1 = ['FRANCE']
         zone2 = ['AUSTRIA, BELGIUM, BULGARIA, CROATIA, REPUBLIC OF CYPRUS, CZECH REPUBLIC, DENMARK, ESTONIA, FINLAND, GERMANY, GREECE, HUNGARY, IRELAND, ITALY, LATVIA, LITHUANIA, LUXEMBOURG, MALTA, NETHERLANDS, POLAND, PORTUGAL, ROMANIA, SLOVAKIA, SLOVENIA, SPAIN, SWEDEN']
+        zone3 = ['afghanistan', 'aland islands', 'albania', 'algeria', 'american samoa', 'andorra', 'angola',
+                            'anguilla', 'antarctica', 'antigua and barbuda', 'argentina', 'armenia', 'aruba',
+                            'australia', 'azerbaijan', 'bahamas (the)', 'bahrain', 'bangladesh', 'barbados', 'belarus',
+                            'belize', 'benin', 'bermuda', 'bhutan', 'bolivia (plurinational state of)',
+                            'bonaire, sint eustatius and saba', 'bosnia and herzegovina', 'botswana', 'bouvet island',
+                            'brazil', 'british indian ocean territory (the)', 'brunei darussalam', 'burkina faso',
+                            'burundi', 'cabo verde', 'cambodia', 'cameroon', 'canada', 'cayman islands (the)',
+                            'central african republic (the)', 'chad', 'chile', 'china', 'christmas island',
+                            'cocos (keeling) islands (the)', 'colombia', 'comoros (the)',
+                            'congo (the democratic republic of the)', 'congo (the)', 'cook islands (the)', 'costa rica',
+                            "cote d'ivoire", 'cuba', 'curacao', 'djibouti', 'dominica', 'dominican republic (the)',
+                            'ecuador', 'egypt', 'el salvador', 'equatorial guinea', 'eritrea', 'ethiopia',
+                            'falkland islands (the) [malvinas]', 'faroe islands (the)', 'fiji', 'france',
+                            'french guiana', 'french polynesia', 'french southern territories (the)', 'gabon',
+                            'gambia (the)', 'georgia', 'ghana', 'gibraltar', 'greenland', 'grenada', 'guadeloupe',
+                            'guam', 'guatemala', 'guernsey', 'guinea', 'guinea-bissau', 'guyana', 'haiti',
+                            'heard island and mcdonald islands', 'holy see (the)', 'honduras', 'hong kong', 'iceland',
+                            'india', 'indonesia', 'iran (islamic republic of)', 'iraq', 'isle of man', 'israel',
+                            'jamaica', 'japan', 'jersey', 'jordan', 'kazakhstan', 'kenya', 'kiribati',
+                            "korea (the democratic people's republic of)", 'korea (the republic of)', 'kuwait',
+                            'kyrgyzstan', "lao people's democratic republic (the)", 'lebanon', 'lesotho', 'liberia',
+                            'libya', 'liechtenstein', 'macao', 'macedonia (the former yugoslav republic of)',
+                            'madagascar', 'malawi', 'malaysia', 'maldives', 'mali', 'marshall islands (the)',
+                            'martinique', 'mauritania', 'mauritius', 'mayotte', 'mexico',
+                            'micronesia (federated states of)', 'moldova (the republic of)', 'monaco', 'mongolia',
+                            'montenegro', 'montserrat', 'morocco', 'mozambique', 'myanmar', 'namibia', 'nauru', 'nepal',
+                            'new caledonia', 'new zealand', 'nicaragua', 'niger (the)', 'nigeria', 'niue',
+                            'norfolk island', 'northern mariana islands (the)', 'norway', 'oman', 'pakistan', 'palau',
+                            'palestine, state of', 'panama', 'papua new guinea', 'paraguay', 'peru',
+                            'philippines (the)', 'pitcairn', 'puerto rico', 'qatar', 'reunion',
+                            'russian federation (the)', 'rwanda', 'saint barthelemy',
+                            'saint helena, ascension and tristan da cunha', 'saint kitts and nevis', 'saint lucia',
+                            'saint martin (french part)', 'saint pierre and miquelon',
+                            'saint vincent and the grenadines', 'samoa', 'san marino', 'sao tome and principe',
+                            'saudi arabia', 'senegal', 'serbia', 'seychelles', 'sierra leone', 'singapore',
+                            'sint maarten (dutch part)', 'solomon islands', 'somalia', 'south africa',
+                            'south georgia and the south sandwich islands', 'south sudan', 'sri lanka', 'sudan (the)',
+                            'suriname', 'svalbard and jan mayen', 'swaziland', 'switzerland', 'syrian arab republic',
+                            'taiwan (province of china)', 'tajikistan', 'tanzania, united republic of', 'thailand',
+                            'timor-leste', 'togo', 'tokelau', 'tonga', 'trinidad and tobago', 'tunisia', 'turkey',
+                            'turkmenistan', 'turks and caicos islands (the)', 'tuvalu', 'uganda', 'ukraine',
+                            'united arab emirates (the)', 'united kingdom of great britain and northern ireland (the)',
+                            'united states minor outlying islands (the)', 'united states of america (the)', 'uruguay',
+                            'uzbekistan', 'vanuatu', 'venezuela (bolivarian republic of)', 'viet nam',
+                            'virgin islands (british)', 'virgin islands (u.s.)', 'wallis and futuna', 'western sahara*',
+                            'yemen', 'zambia', 'zimbabwe']
         country = str.upper(country)
         if country in zone1:
             return 'Domestic'
         elif country in zone2:
             return 'Rest of EU'
-        else:
+        elif country in zone3:
             return 'International'
+        else:
+            return False
 
     def get_country(self):
         return self.country
         
-    def city(self):
+    def set_city(self):
         return self.city
 
-    def address(self, address):
+    def set_address(self, address):
         return self.address
 
-    def code(self, code):
+    def set_code(self, code):
             return self.code
 
 class Package:
@@ -223,15 +270,9 @@ class Order:
         return f'Your order has been completed. Tracking number: {self.__tracking_id}'
 
 
-
-
-
-#test sukanya
-if __name__ == '__main__':
     # example
     Sender1 = From('andy', 1234567890,'france','paris','qwert', 12345)
     print(Sender1)
 
     user = Package(24)
     print(user)
-
