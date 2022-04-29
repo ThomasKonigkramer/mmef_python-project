@@ -47,6 +47,11 @@ class PaymentCards(Customers.Customers):
 
 
     def set_card_balance(self, amount):
+        try:
+            int(amount)
+        except ValueError:
+            return 'Must provide a number'
+        amount = int(amount)
         if amount <= 0:
             return f'Expecting a positive number for the card balance'
         else:
@@ -59,29 +64,45 @@ class PaymentCards(Customers.Customers):
 
 
     def get_card_number(self):
-        return {self.card_number}
+        return self.card_number
+
+    def get_card_balance(self):
+        return self.card_balance
 
 
     def get_expiry_date(self):
-        return {self.expiry_date}
+        return self.expiry_date
+    
+    def get_datetime_expiry(self):
+        date = self.expiry_date
+        day, month, year = date.split('/')
+        return datetime(int(year), int(month), int(day))
 
 
     def withdraw(self, amount):
         # Cannot withdraw: amount is greater than balance
-        if self.card_balance < amount:
-            return 0
-        else:
+        remaining_cost = amount - self.card_balance
+        if remaining_cost < 0:
+            remaining_cost = 0
+        if amount <= self.card_balance:
             self.card_balance -= amount
-            return self.card_balance
+        else:
+            self.card_balance = 0
+        return remaining_cost
 
-
-    def is_expired(self, today):
+    def is_expired(self):
         # Card is expired and credited amounts are lost.
-        if self.expiry_date > today:
+        today = datetime.now().date()
+        day, month, year = self.expiry_date.split('/')
+        expiry = datetime(int(year), int(month), int(day)).date()
+        if expiry > today:
             return 1
         # f'Card expiry not reached. Balance of {self.card_balance} remaining and valid until {self.expiry_date}.
         else:
             return 0
+    
+    def get_card_details(self):
+        return [self.username, self.card_number, self.expiry_date, self.card_balance]
 
 
 def check_date_valid(date):
@@ -89,6 +110,7 @@ def check_date_valid(date):
     returns true or false depending on whether the date provided is valid (true) or not (false)
     '''
     if not re.search(r'\d{2}/\d{2}/\d{2}', date):
+        print(re.search(r'\d{2}/\d{2}/\d{2}', date))
         return False
     else:
         day, month, year = date.split('/')

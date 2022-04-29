@@ -7,6 +7,9 @@ authors:        Thomas Konigkramer
 2 -- printing and formating
 3 -- user prompts and information validation
 4 -- menues
+
+Version 1       User sign-in/sign-up; dynamic options menu; dynamic prompt menues; database set-up for customers and paymentcards
+Version 2       function:      
 """
 
 '''importing python packages'''
@@ -18,12 +21,13 @@ from datetime import datetime
 '''importing custom classes and modules'''
 import Customers
 import PaymentCards
-# import Price
-# import Discount
+import Price
+import Discount
+import Order
 
 ###################################################################################################
 '''
-database functions
+database and custom classes functions
 '''
 
 '''retrieve database information'''
@@ -39,6 +43,12 @@ def get_dbdirectory(db):
     if db == 'customers':
         customers_dir = db_dir + '\db_customers.csv'
         return customers_dir
+    elif db == 'paymentcards':
+        paymentcards_dir = db_dir + '\db_paymentcards.csv'
+        return paymentcards_dir
+    elif db == 'orders':
+        orders_dir = db_dir + '\db_orders.csv'
+        return orders_dir
 
 def get_dbasdf(db):
     '''
@@ -50,22 +60,24 @@ def get_dbasdf(db):
         customers_dir = get_dbdirectory('customers')
         df_customers = pd.read_csv(customers_dir)
         return df_customers
-    elif db == '':
-           # orders_dir = db_dir + '\db_orders.csv'
-        # paymentcards_dir = db_dir + '\db_paymentcards.csv'
-        # promocodes_dir = db_dir + '\db_promocodes.csv'
-        # df_packages = pd.read_csv(orders_dir)
-        # df_paymentcards = pd.read_csv(paymentcards_dir) 
-        # df_promocodes = pd.read_csv(promocodes_dir)
+    elif db == 'paymentcards':
+        paymentcards_dir = get_dbdirectory('paymentcards') 
+        df_paymentcards = pd.read_csv(paymentcards_dir)  
+        return df_paymentcards
+    elif db == 'orders':
+        orders_dir = get_dbdirectory('orders')
+        df_orders = pd.read_csv(orders_dir)
+        return df_orders
+    else:
         return ''
 
 
-def user_id_format(user_id):
+def id_format(id):
     '''
-    db_customers.csv stores user_id as integer, but is a 9 digit code, with leading zeros
+    db_s.csv stores user_id as integer, but is a 9 digit code, with leading zeros
     converts number from db to have leading zeros
     '''
-    return str(user_id).rjust(9,'0')
+    return str(id).rjust(9,'0')
 
 
 def retrieve_list_from_db(df, item):
@@ -77,7 +89,7 @@ def retrieve_list_from_db(df, item):
     if item == "User_id":
         retrieved_list = df[item].to_list()
         for i in range(len(retrieved_list)):
-            retrieved_list[i] = user_id_format(retrieved_list[i])
+            retrieved_list[i] = id_format(retrieved_list[i])
     else:
         retrieved_list = df[item].to_list()
     
@@ -96,12 +108,12 @@ def call_customer_from_db(identifier, use_username = True):
     if use_username is True:
         row = df[df['Username']==identifier]
         username = identifier
-        user_id = user_id_format(row['User_id'].iloc[0])
+        user_id = id_format(row['User_id'].iloc[0])
     else:
         identifier = int(identifier)
         row = df[df['User_id']==identifier]
         username = row['Username'].iloc[0]
-        user_id = user_id_format(identifier)
+        user_id = id_format(identifier)
 
     firstname = row['Name'].iloc[0]
     surname = row['Surname'].iloc[0]
@@ -111,7 +123,63 @@ def call_customer_from_db(identifier, use_username = True):
 
     return customer
 
+
+def call_paymentcards_from_db(customer):
+    '''
+    returns list of paymentcards belonging to user
+    '''
+    username = customer.get_username()
+    df = get_dbasdf('paymentcards')
+    cards_df = df[df['Username']==username]
+    cards_list = cards_df.values.tolist()
+
+    firstname = customer.get_firstname()
+    surname = customer.get_surname()
+    user_id = customer.get_userid()
+    password = customer.get_password()
+    paymentcards = []
+    for card in cards_list:
+        paymentcard = PaymentCards.PaymentCards(firstname, surname, username, user_id, password)
+        paymentcard.set_card_number(card[1])
+        paymentcard.set_expiry_date(card[2])
+        paymentcard.set_card_balance(card[3])
+        paymentcards.append(paymentcard)
+
+    return paymentcards
+
+
+
+# paymentcards = call_paymentcards_from_db('jimmy')
+# for card in paymentcards:
+#     print(card)
+
 # call_customer_from_db('jimmy')
+
+
+def sort_paymentcards(customer):
+    '''
+    returns list of paymentcard instances
+    '''
+    paymentcards = call_paymentcards_from_db(customer)
+    for card in paymentcards:
+        if card.is_expired() == True:
+            paymentcards.remove(card)
+        if card.get_card_balance() == 0:
+            paymentcards.remove(card)
+
+    # for card in paymentcards:
+    #     print(card.get_expiry_date())
+    paymentcards.sort(key = lambda x: x.get_datetime_expiry())
+    # for card in paymentcards:
+    #     print(card.get_expiry_date())
+   
+    return paymentcards
+    
+
+
+
+customer = call_customer_from_db('jimmy')
+sort_paymentcards(customer)
 
 def in_db(instance, db):
     '''
@@ -125,26 +193,55 @@ def modify_db(instance, db):
     parameters: instance - is a module (customer, paymentcard, etc.)
                 db - name of database to write to
     '''
-    if db == 'customers':
-        customers_dir = get_dbdirectory(db)
-        df = get_dbasdf(db)
+    dir = get_dbdirectory(db)
+    df = get_dbasdf(db)
+    column_names = list(df)
+    if db == 'customers':      
         customer_details = instance.get_detailslist()
-        column_names = list(df)
         df_newcustomer = pd.DataFrame([customer_details], columns = column_names)
         df = pd.concat([df, df_newcustomer], ignore_index = False)
-        df.to_csv(customers_dir, index = False)
+        df.to_csv(dir, index = False)
     
     elif db == 'paymentcards':
-        print('to-do')
-        # if payment card exists, then update amount
-        # else - i.e. doesn't exist - then add
+        card_numbers = retrieve_list_from_db(df, 'Card_number')
+        # print(card_numbers)
+        card_details = instance.get_card_details()
+        if instance.get_card_number() in card_numbers:
+            # print(instance.get_card_number())
+            # df.replace(to_replace=)
+            # print(instance.get_card_balance())
+            df.loc[df['Card_number']==instance.get_card_number(), 'Card_balance'] = instance.get_card_balance()
+            df.to_csv(dir, index = False)
+            # df['Card_balance'] = df[df['Card_number']==instance.get_card_number()]['Card_balance']=instance.get_card_balance()
+        else:            
+            df_newcard = pd.DataFrame([card_details], columns = column_names)
+            df = pd.concat([df, df_newcard], ignore_index = False)
+            df.to_csv(dir, index = False)
+    elif db == 'orders':
+        order_details = instance.get_order_details_list()
+        df_neworder = pd.DataFrame([order_details], columns = column_names)
+        df = pd.concat([df, df_neworder], ignore_index = False)
+        df.to_csv(dir, index = False)
 
+def find_max_id(id_list):
+    '''
+    function for version user and tracking ids
+    '''
+    max_id = 0
+    for ids in id_list:
+        ids = int(ids)
+        if ids > max_id:
+            max_id = ids
+    # temporarily string instead of integer in db, but causes no issues
+    new_id = id_format(max_id + 1)
+    return new_id
 
 
 ###################################################################################################
 '''
 printing/formating functions
 '''
+
 
 def print_bars():
     '''
@@ -174,7 +271,7 @@ def print_username_or_id():
     print('Login details:')
     print('1 -- Username')
     print('2 -- User ID')
-    print('3 -- Back')
+    print('3 -- Return to main menu')
     print_bars()
 
 
@@ -187,10 +284,45 @@ def print_customer_menu():
     print('1 -- Place a new order')
     print('2 -- View orders in progress')
     print('3 -- View order history')
-    print('4 -- View my gift-card/payment-card balances')
-    print('5 -- Add gift-card or payment-card')
-    print('6 -- Exit')
+    print('4 -- Add gift-card or payment-card')
+    print('5 -- View my gift-card/payment-card balances')
+    print('6 -- Return to main menu')
     print_bars()
+
+
+def print_shipping_method():
+    '''
+    printing function - shipping method options
+    '''
+    print_bars()
+    print('These are the shipping method options:')
+    print('1 -- Priority')
+    print('2 -- Express')
+    print('3 -- Standard')
+    print('4 -- Return to main menu')
+    print_bars()
+
+def print_discount_menu():
+    '''
+    printing function - is discount flat or percentage
+    '''
+    print_bars()
+    print('1 -- Percentage discount')
+    print('2 -- Flat discount')
+    print('3 -- Return to main menu')
+    print_bars()
+
+def print_payment_menu():
+    '''
+    printing function - payment menu
+    '''
+    print_bars()
+    print('This is the payment menu.')
+    print('1 -- Pay by cash')
+    print('2 -- Pay by gift-card/payment-card')
+    print('3 -- Cancel order and return to main menu')
+    print_bars()
+
 
 ###################################################################################################
 '''
@@ -257,7 +389,7 @@ def info_prompt_check(request, requests = [], is_signup = True):
         try:
             prompt = input(f'{request}: ')
             if request == 'User_id':
-                prompt = user_id_format(prompt)
+                prompt = id_format(prompt)
         except:
             print_bars()
             print('Invalid information provided.')
@@ -330,25 +462,7 @@ def info_prompt_hidden(request, requests = []):
             else:
                 return prompt
 
-    
-def check_date_valid(date):
-    '''
-    returns true or false depending on whether the date provided is valid (true) or not (false)
-    '''
-    day, month, year = date.split('/')
-    try:
-        datetime(int(year), int(month), int(day))
-        return True
-    except ValueError:
-        return False
 
-def check_paymentcard_valid(card_number):
-    '''
-    simply checking that does not already exist in db and that of correct form
-    '''
-
-
-# print(check_date_valid('09/14/22'))
 ###################################################################################################
 '''
 menu functions
@@ -397,7 +511,7 @@ def signin_menu():
         3 : [print_bars, 
         'Returning to Welcome menu.',
         print_bars,
-        welcome_menu]
+        main]
     }
     unique_identifier = option_menu(signin_menu_dic)
     if unique_identifier == 1:
@@ -437,13 +551,8 @@ def signup_menu():
     password = info_prompt_hidden('Password')
  
     user_ids = retrieve_list_from_db(df, 'User_id')
-    max_id = 0
-    for ids in user_ids:
-        ids = int(ids)
-        if ids > max_id:
-            max_id = ids
-    # temporarily string instead of integer in db, but causes no issues
-    user_id = user_id_format(max_id + 1)
+    
+    user_id = find_max_id(user_ids)
     
     customer = Customers.Customers(firstname, surname, username, user_id, password)
     
@@ -454,20 +563,6 @@ def signup_menu():
     print(customer)
 
     return customer
-
-
-def new_paymentcard(customer):
-    '''
-    returns list of paymentcard instances
-    '''
-    # while card_number not 
-    #     card_number = 
-    # while expiry_date
-    #     expiry_date = 
-    # card_balance = 0
-    # while type(card_balance) <= int:
-    #     card_balance = 
-
 
 
 def customer_menu(customer):
@@ -486,69 +581,300 @@ def customer_menu(customer):
     6 : [print_bars, 
         'Thank you for visiting the KMX Shipping Platfrom. Enjoy your day.',
         print_bars,
-        exit]
+        main]
     }
 
     next_menu = option_menu(customer_menu_dic)
 
     if next_menu == 1:
-        print('new order')
+        order = new_order(customer)
+        paying = payment(order)
     elif next_menu == 2:
-        print('orders in progress')
+        print('Orders in progress')
+        print('This feature is currently not available.')
+        print('Returning to customer menu')
+        customer_menu(customer)
     elif next_menu == 3:
-        print('order history')
+        print('Order history')
+        print('This feature is currently not available.')
+        print('Returning to customer menu')
+        customer_menu(customer)
     elif next_menu == 4:
-        print('add gift card/payment card')
+        print('Add gift card/payment card')
+        new_card = new_paymentcard(customer)
+        print('New card has been created')
+        print('Returning to customer menu')
+        customer_menu(customer)
     elif next_menu == 5:
-        print('view payment cards')
+        print('View payment cards:')
+        paymentcards = call_paymentcards_from_db(customer)
+        if paymentcards == []:
+            print_bars()
+            print(f'{customer.get_username()} does not have any gift-cards/payment-cards')
+        for card in paymentcards:
+            print(card)
+        customer_menu(customer)
         
 
-def display_paymentcards(customer):
+def new_order(customer):
+    '''
+    this function makes use of the Order, Price and Discount classes to create and price a new order
+    returns order instance
+    '''
+    print_bars()
+    print(f'Creating new order for {customer.get_firstname()} {customer.get_surname()}')
+
+
+    print_bars()
+    print('Requesting sender information:')
+    sender_details = Order.From()
+
+    name = info_prompt_check("Sender's Full Name")
+    while sender_details.set_name(name) != None:
+        print_bars()
+        print(sender_details.set_name(name))
+        name = info_prompt_check("Sender's Full Name")
+    
+    country = info_prompt_check('Sender Country')
+    while sender_details.set_country(country) != None:
+        print_bars()
+        print(sender_details.set_country(country))
+        country = info_prompt_check('Sender Country')
+
+
+    print_bars()
+    print('Requesting receiver information:')
+    receiver_details = Order.Destination()
+    
+    name = info_prompt_check("Receiver's Full Name")
+    while receiver_details.set_name(name) != None:
+        print_bars()
+        print(receiver_details.set_name(name))
+        name = info_prompt_check("Receiver's Full Name")
+    
+    country = info_prompt_check('Destination Country')
+    while receiver_details.set_country(country) != None:
+        print_bars()
+        print(receiver_details.set_country(country))
+        country = info_prompt_check('Destination Country')
+
+
+    print_bars()
+    print('Requesting package details:')
+    package_details = Order.Package()
+
+    weight = info_prompt_check("Package's weight (kg)")
+    while package_details.set_package_size(weight) != None:
+        print_bars()
+        print(package_details.set_package_size(weight))
+        weight = info_prompt_check("Package's weight (kg)")
+
+    ## pricing ##
+    print_bars()
+    package_weight = package_details.get_package_size()
+    destination = receiver_details.get_country_zone(receiver_details.get_country())
+    package_category = package_details.get_package_size()
+    price = Price.Price(destination, package_category, package_weight)
+    price.shipping_destination() # to convert
+    price.packagesize() # to convert
+    print(price.get_price_options()) # options 
+    shipping_method_dir = {
+        0 : print_bars,
+        1 : [1],
+        2 : [2],
+        3 : [3]
+    }
+
+    shipping_method = option_menu(shipping_method_dir)
+    
+    package_details.set_shipping_method(shipping_method) # set after seeing effect on price
+    shipping_method_cat = package_details.get_shipping_method_category() # convert
+
+    price.set_time(shipping_method_cat) # setting time to delivery
+    price.set_price(shipping_method_cat) # setting price chosen
+
+    print_bars()
+    print('Checking if you have a valid discount:')
+
+    is_discount = True # would include some code/check - excluded in this project
+    
+    discount_menu_dir = {
+        0 : print_discount_menu,
+        1 : [1],
+        2 : [2],
+        3 : [print_bars,
+        'Returning to Welcome menu.',
+        print_bars,
+        main]
+    }
+    
+    flat_or_perc = option_menu(discount_menu_dir)
+
+    if flat_or_perc == 1:
+        flat_or_perc = '%'
+    else:
+        flat_or_perc = 'flat'
+
+    disc_rate = int(info_prompt_check('Flat/percentage discount rate'))
+
+    price_shipping = price._shipping_method
+    # print(price_shipping)
+    price_destination = price._shipping_destination
+    # print(price_destination)
+    price_pack_size = price._package_size
+    # print(price_pack_size)
+    
+    discounting = Discount.Discount(is_discount, flat_or_perc, disc_rate, price_shipping, price_destination, price_pack_size, package_details.get_package_size(), price.price, price.time)
+    
+    print(discounting.set_discounting())
+    # print(discounting.price)
+    # print(discounting.discountedprice)
+
+    if discounting.discountedprice == 0:
+        final_price = discounting.price
+    else:
+        final_price = discounting.discountedprice
+
+    # create order instance
+    today = datetime.now().date().strftime("%d/%m/%y") # order date
+    order = Order.Order(customer, final_price, today)
+
+    df = get_dbasdf('orders')
+
+    tracking_ids = retrieve_list_from_db(df, 'Tracking_number')
+    # print(tracking_ids)
+    tracking_id = find_max_id(tracking_ids)
+
+    order.set_tracking_id(tracking_id)
+
+    return order
+
+
+
+def new_paymentcard(customer):
     '''
     returns list of paymentcard instances
     '''
-    print('')
+    firstname = customer.get_firstname()
+    surname = customer.get_surname()
+    username = customer.get_username()
+    user_id = customer.get_userid()
+    password = customer.get_password()
+
+    new_card = PaymentCards.PaymentCards(firstname, surname, username, user_id, password)
+
+    card_number = info_prompt_check('Card number')
+    while new_card.set_card_number(card_number) != None:
+        print_bars()
+        print(new_card.set_card_number(card_number))
+        card_number = info_prompt_check('Card number')
+
+    expiry_date = info_prompt_check('Expiry date')
+    while new_card.set_expiry_date(expiry_date) != None:
+        print_bars()
+        print(new_card.set_expiry_date(expiry_date))
+        expiry_date = info_prompt_check('Expiry date')
+    
+    card_balance = info_prompt_check('Card balance')
+    while new_card.set_card_balance(card_balance) != None:
+        print_bars()
+        print(new_card.set_card_balance(card_balance))
+        card_balance = info_prompt_check('Card balance')
+
+    modify_db(new_card, 'paymentcards')
+
+    return new_card
+
+# customer1 = call_customer_from_db('zo')
+# cards = sort_paymentcards(customer1)
+# cost = 7500
+
+# for card in cards:
+#     cost = card.withdraw(cost) 
+#     print(card) 
+#     modify_db(card, 'paymentcards')
+#     # print(cost) 
+
+# print(f'{cost} of the total cost remains to be paid in cash.')
+
+def payment(order):
+    print_bars()
+    print('Proceeding to payment - how will you pay:')
+
+    payment_menu_dir = {
+        0 : print_payment_menu,
+        1 : [1], # cash
+        2 : [2],  # gift card
+        3 : [print_bars, 
+        'Returning to Welcome menu.',
+        print_bars,
+        main]
+    }
+
+    payment_method = option_menu(payment_menu_dir)
+
+    if payment_method == 1:
+        print_bars()
+        print('You are paying by cash - thank you very much')
+        modify_db(order, 'orders')
+        print(order)
+    else:
+        print_bars()
+        print('You are paying by gift-card/payment-card')
+        modify_db(order, 'orders')
+        cards = sort_paymentcards(customer)
+        cost = order.get_price() #order.discountprice
+
+        for card in cards:
+            cost = card.withdraw(cost) 
+            # print(card) 
+            modify_db(card, 'paymentcards')
+        
+        if cost > 0:
+            print_bars()
+            print(f'{cost} of the total cost remains to be paid in cash.')
+        else:
+            print_bars()
+            print('Your gift-cards/payment-cards paid the entirety of the delivery cost.')
+        # print(order)
 
 
-def use_paymentcards(customer):
-    '''
-    returns list of paymentcard instances
-    '''
-    print('')
+# customer1 = call_customer_from_db('jimmy')
+# order1 = new_order(customer1)
+# print(order1)
 
-# customer = Customers.Customers('Alex', 'Tester', 'tester', '000000003', 'test')
 
 def main():
     customer = welcome_menu()
 
-    order = customer_menu(customer)
+    customer_action = customer_menu(customer)
 
-    exit()
+    print_bars()
+    print('Thank you for visiting the KMX Shipping Platfrom. Logging you off.')
 
-
-# def last_menu(menu):
-#     if menu == 'welcome':
-#         print_bars()
-#         print('Returning to Welcome Menu')
-#         welcome_menu()
-#     elif menu == 'signin':
-#         print_bars()
-#         print('Returning to Sign-in Menu')
-#         signin_menu()
-#     elif menu == 'signup':
-#         print_bars()
-#         print('Returning to Sign-up Menu')
-#         signup_menu()
-#     # elif payment:
-#     elif menu == '':
-#         print_bars()
-#         print('Back to function called without adequate parameters set')
-#         print_bars()    
-#     elif menu == 'main':
-#         main()
-
+    main()
 
 ###################################################################################################    
 
 
 main()
+
+
+
+# customer1 = call_customer_from_db('jimmy')
+# sender1 = Order.From('Bob Davis', 'France')
+# # print(sender1.country)
+# receiver1 = Order.Destination('Charley Man', 'South Africa')
+# package1 = Order.Package(3,1)
+# # shipping_method_4th = 1/2/3
+# discount1 = Discount.Discount(True, 'flat', 5, package1.get_shipping_method(), receiver1.get_country(), package1.get_package_size(), 30, '1 day',29)
+# today = datetime.now().date().strftime("%d/%m/%y")
+# # print(today)
+
+# order1 = Order.Order(customer1, sender1, receiver1, package1, discount1, today, 3)
+
+# test = order1.get_order_details_list()
+# # print(test)
+
+# sender2 = order1.get_sender()
+# print(sender2.get_country())

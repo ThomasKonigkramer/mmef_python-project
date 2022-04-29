@@ -29,7 +29,6 @@ class ShippingDetail:
         self.shipping_time = shipping_time
         self.premium = premium
 
-
 priority = ShippingDetail('Priority', '1 day', 10)
 express = ShippingDetail('Express', '2-3 days', 5)
 standard = ShippingDetail('Standard', '5-6 days', 0)
@@ -37,12 +36,9 @@ standard = ShippingDetail('Standard', '5-6 days', 0)
 
 baseprice = 8.0
 
-"""price pre discounts"""
-
-
 class Price(Package,Destination):
-
-    def __init__(self, shipping_method, _shipping_destination, _package_size, price, time):
+   
+    def __init__(self, _shipping_destination, _package_size, shipping_method = '', price = 0, time = 0):
         self._shipping_method = shipping_method
         self._shipping_destination = _shipping_destination
         self._package_size = _package_size
@@ -58,23 +54,23 @@ class Price(Package,Destination):
         
     #based on Order destination| setting it to a numeric value to use in Price
     def shipping_destination(self):
-        if self.get_country(self.country) == 'Domestic':
+        if self.get_country_zone(self.country) == 'Domestic':
             self._shipping_destination = 1
-        elif self.get_country(self.country) == 'Rest of EU':
+        elif self.get_country_zone(self.country) == 'Rest of EU':
             self._shipping_destination = 1.25
-        elif self.get_country(self.country) == 'International':
+        elif self.get_country_zone(self.country) == 'International':
             self._shipping_destination = 2
         return self._shipping_destination
     
     #based on Order Package | setting it to a numeric value to use in Price
     def packagesize(self):
-        if self.package_size() == 'small':
-            self._package_size = 1
-        elif self.package_size() == 'medium':
-            self._package_size = 1.25
-        elif self.package_size() == 'big':
-            self._package_size = 2
-        return self._package_size
+      if self.get_package_size_category() == 'small':
+         self._package_size = 1
+      elif self.get_package_size_category() == 'medium':
+         self._package_size = 1.25
+      elif self.get_package_size_category() == 'big':
+         self._package_size = 2
+      return self._package_size
             
     def set_price(self, shipping_meth):
          if shipping_meth == priority.shipping_method:
@@ -100,13 +96,16 @@ class Price(Package,Destination):
     def get_price_options(self):
         print("Your price options are :")
         print('')
-        return(tabulate([['Priority', '1 day', self.set_price(priority.shipping_method)], ['Express', '2-3 days', self.set_price(express.shipping_method)], ['Standard', '5-6 days', self.set_price(standard.shipping_method)]], headers=['Service', 'Expected time', 'Price(€)']))
+        return(tabulate([['1 --', 'Priority', '1 day', self.set_price(priority.shipping_method)], ['2 --', 'Express', '2-3 days', self.set_price(express.shipping_method)], ['3 --', 'Standard', '5-6 days', self.set_price(standard.shipping_method)]], headers=['Option', 'Service', 'Expected time', 'Price(€)']))
 
+   # added this - tom
+    def set_shipping_method(self, method):
+       self.shipping_method = method
 
 """test"""
+if __name__ == '__main__':
+   user = Price("Standard", 1, 1.5, 2, 0)
+   print(user.set_price(user._shipping_method))
+   # print('\nYour price is ', user.set_price(user._shipping_method), "€ and you will get your delivery in ", user.set_time(user._shipping_method),"!Be there soon!")
 
-user = Price("Standard", 1, 1.5, 2, 0)
-print(user.set_price(user._shipping_method))
-print('\nYour price is ', user.set_price(user._shipping_method), "€ and you will get your delivery in ", user.set_time(user._shipping_method),"!Be there soon!")
-
-print(user.get_price_options())
+   print(user.get_price_options())
