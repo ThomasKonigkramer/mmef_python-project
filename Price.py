@@ -116,3 +116,4 @@ print(Destination.get_country_zone(Sender1,Sender1.country))
 Sender1PRICE = Price(Price.shipping_destination(Sender1),Price.packagesize(Sender1p),Price.get_shipping_method_category(Sender1p))
 
 print(Sender1PRICE.get_price_options())
+print(Sender1PRICE.set_price(Price.get_shipping_method_category(Sender1p)))
