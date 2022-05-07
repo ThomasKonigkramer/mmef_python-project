@@ -67,7 +67,7 @@ class Price(Package,Destination):
       if self.get_package_size_category() == 'small':
          self._package_size = 1
       elif self.get_package_size_category() == 'medium':
-         self._package_size = 1.25
+         self._package_size = 1.75
       elif self.get_package_size_category() == 'big':
          self._package_size = 2
       return self._package_size
