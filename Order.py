@@ -124,7 +124,7 @@ class Destination:
                             'turkmenistan', 'turks and caicos islands (the)', 'tuvalu', 'uganda', 'ukraine',
                             'united arab emirates (the)', 'united kingdom of great britain and northern ireland (the)',
                             'united states minor outlying islands (the)', 'united states of america (the)', 'uruguay',
-                            'uzbekistan', 'vanuatu', 'venezuela (bolivarian republic of)', 'viet nam',
+                            'uzbekistan', 'vanuatu', 'venezuela (bolivarian republic of)', 'vietnam',
                             'virgin islands (british)', 'virgin islands (u.s.)', 'wallis and futuna', 'western sahara*',
                             'yemen', 'zambia', 'zimbabwe']
         country = country.upper()
@@ -327,9 +327,5 @@ class Order:
         return f'Your order has been completed. Tracking number: {self.__tracking_id}'
 
 
-    # example
-    Sender1 = From('andy', 1234567890,'france','paris','qwert', 12345)
-    print(Sender1)
 
-    user = Package(24)
-    print(user)
+

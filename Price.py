@@ -18,7 +18,7 @@ from enum import Enum
 from Order import Package
 from Order import Destination
 
-#converting order output to be clcompatible to price input
+#converting order output to be compatible to price input
 
 
 
@@ -38,7 +38,7 @@ baseprice = 8.0
 
 class Price(Package,Destination):
    
-    def __init__(self, _shipping_destination, _package_size, shipping_method = '', price = 0, time = 0):
+    def __init__(self, _shipping_destination = 0, _package_size = 0, shipping_method = '', price = 0, time = 0):
         self._shipping_method = shipping_method
         self._shipping_destination = _shipping_destination
         self._package_size = _package_size
@@ -106,10 +106,13 @@ class Price(Package,Destination):
     def set_shipping_method(self, method):
        self.shipping_method = method
 
-"""test"""
-if __name__ == '__main__':
-   user = Price("Standard", 1, 1.5, 2, 0)
-   print(user.set_price(user._shipping_method))
-   # print('\nYour price is ', user.set_price(user._shipping_method), "€ and you will get your delivery in ", user.set_time(user._shipping_method),"!Be there soon!")
 
-   print(user.get_price_options())
+# example
+Sender1 = Destination('andy','BELGIUM')
+Sender1p = Package(4,2)
+print(Sender1)
+print(Sender1p)
+print(Destination.get_country_zone(Sender1,Sender1.country))
+Sender1PRICE = Price(Price.shipping_destination(Sender1),Price.packagesize(Sender1p),Price.get_shipping_method_category(Sender1p))
+
+print(Sender1PRICE.get_price_options())
