@@ -29,7 +29,7 @@ class ShippingDetail:
         self.shipping_time = shipping_time
         self.premium = premium
 
-priority = ShippingDetail('Priority', '1 day', 10)
+priority = ShippingDetail('Priority', '1 day', 7)
 express = ShippingDetail('Express', '2-3 days', 5)
 standard = ShippingDetail('Standard', '5-6 days', 0)
 
