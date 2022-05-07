@@ -42,13 +42,13 @@ def get_dbdirectory(db):
     db_dir = working_dir + '\database'
     
     if db == 'customers':
-        customers_dir = db_dir + '\db_customers.csv'
+        customers_dir = os.path.join(db_dir,'db_customers.csv')
         return customers_dir
     elif db == 'paymentcards':
-        paymentcards_dir = db_dir + '\db_paymentcards.csv'
+        paymentcards_dir = os.path.join(db_dir,'db_paymentcards.csv')
         return paymentcards_dir
     elif db == 'orders':
-        orders_dir = db_dir + '\db_orders.csv'
+        orders_dir = os.path.join(db_dir, 'db_orders.csv')
         return orders_dir
 
 
@@ -678,13 +678,12 @@ def new_order(customer):
 
     ## pricing ##
     print_bars()
-    package_weight = package_details.get_package_size()
-    destination = receiver_details.get_country_zone(receiver_details.get_country())
-    package_category = package_details.get_package_size()
-    price = Price.Price(destination, package_category, package_weight)
-    price.shippingdestination() # to convert
-    price.packagesize() # to convert
+    destination = Price.Price.shipping_destination(receiver_details)
+    package_size = Price.Price.packagesize(package_details)
+    shipping_method = Price.Price.get_shipping_method_category(package_details)
+    price = Price.Price(destination, package_size, shipping_method)
     print(price.get_price_options()) # options 
+
     shipping_method_dir = {
         0 : print_bars,
         1 : [1],
