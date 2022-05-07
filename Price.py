@@ -74,6 +74,10 @@ class Price(Package,Destination):
             
     def set_price(self, shipping_meth):
          if shipping_meth == priority.shipping_method:
+            # print(baseprice)
+            # print(self.shippingdestination())
+            # print(self.packagesize())
+            # print(priority.premium)
             self.price = baseprice + 5*self.shipping_destination() + 2.5*self.packagesize() + priority.premium
          elif shipping_meth == express.shipping_method:
             self.price =  baseprice + 5*self.shipping_destination() + 2.5*self.packagesize() + express.premium

@@ -288,6 +288,17 @@ def print_shipping_method():
 
 def print_discount_menu():
     '''
+    printing function - whether there is a discount or not
+    '''
+    print_bars()
+    print('1 -- I have a discount code')
+    print('2 -- I do not have a discount code')
+    print('3 -- Return to main menu')
+    print_bars()
+
+
+def print_disc_type_menu():
+    '''
     printing function - is discount flat or percentage
     '''
     print_bars()
@@ -671,7 +682,7 @@ def new_order(customer):
     destination = receiver_details.get_country_zone(receiver_details.get_country())
     package_category = package_details.get_package_size()
     price = Price.Price(destination, package_category, package_weight)
-    price.shipping_destination() # to convert
+    price.shippingdestination() # to convert
     price.packagesize() # to convert
     print(price.get_price_options()) # options 
     shipping_method_dir = {
@@ -692,7 +703,7 @@ def new_order(customer):
     print_bars()
     print('Checking if you have a valid discount:')
 
-    is_discount = True # would include some code/check - excluded in this project
+    # is_discount = True # would include some code/check - excluded in this project
     
     discount_menu_dir = {
         0 : print_discount_menu,
@@ -703,15 +714,34 @@ def new_order(customer):
         print_bars,
         main]
     }
-    
-    flat_or_perc = option_menu(discount_menu_dir)
+
+    is_discount = option_menu(discount_menu_dir)
+
+    disc_type_menu_dir = {
+        0 : print_disc_type_menu,
+        1 : [1],
+        2 : [2],
+        3 : [print_bars,
+        'Returning to Welcome menu.',
+        print_bars,
+        main]
+    }
+
+    if is_discount == 1:
+        is_discount = True
+        flat_or_perc = option_menu(disc_type_menu_dir)
+        disc_rate = int(info_prompt_check('Flat/percentage discount rate'))
+    elif is_discount == 2:
+        is_discount = False
+        flat_or_perc = '' # won't be used
+        disc_rate = 0 # won't be used
+
 
     if flat_or_perc == 1:
         flat_or_perc = '%'
-    else:
+    elif flat_or_perc == 2:
         flat_or_perc = 'flat'
-
-    disc_rate = int(info_prompt_check('Flat/percentage discount rate'))
+    
 
     price_shipping = price._shipping_method
     # print(price_shipping)
