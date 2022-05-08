@@ -6,7 +6,7 @@
 
 # print('where are you shipping from:')
 import time
-class From:
+class Sender:
 
     def __init__(self, name = '', country = '', phonenumber = 0000000000, city = '-', address= '-', code='-'):
         self.name = name
