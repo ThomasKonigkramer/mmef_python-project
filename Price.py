@@ -29,7 +29,7 @@ class ShippingDetail:
         self.shipping_time = shipping_time
         self.premium = premium
 
-priority = ShippingDetail('Priority', '1 day', 10)
+priority = ShippingDetail('Priority', '1 day', 7)
 express = ShippingDetail('Express', '2-3 days', 5)
 standard = ShippingDetail('Standard', '5-6 days', 0)
 
@@ -67,7 +67,7 @@ class Price(Package,Destination):
       if self.get_package_size_category() == 'small':
          self._package_size = 1
       elif self.get_package_size_category() == 'medium':
-         self._package_size = 1.25
+         self._package_size = 1.5
       elif self.get_package_size_category() == 'big':
          self._package_size = 2
       return self._package_size

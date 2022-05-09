@@ -6,11 +6,10 @@ author: Sukanya Mukherjee
 Discounts
 """
 
-from traceback import print_last
 from Price import Price
 
 class Discount(Price):
-    def __init__(self, discount, type, discountamount, discountedprice, shipping_method, _shipping_destination, _package_size, price, time):
+    def __init__(self, discount, type, discountamount = 0, discountedprice = 0, _shipping_destination = 0, _package_size = 0, shipping_method = '', price = 0, time = 0):
         
         Price.__init__(self, shipping_method, _shipping_destination, _package_size, price, time)
 
@@ -25,46 +24,27 @@ class Discount(Price):
            return ("Minimum purchase of 20€ required to avail discount") 
         else : 
             if self.discount == True and self.type == "%":
-                if self.discountamount <10 :
+                if self.discountamount in range(1,10,1) :
                     self.discountedprice = self.set_price(self._shipping_method)*(1 - self.discountamount/100)
+                    return(f'Congrats! Your new price is {self.discountedprice:.2f} €. You have saved {self.price - self.discountedprice:.2f} €!')  
                 else :
                     return("Sorry! That is an invalid discount. Your price remains the same.")
             elif self.discount == True and self.type =="flat":
-                if self.discountamount <5 :
+                if self.discountamount in range(1,5,1) :
                     self.discountedprice = self.set_price(self._shipping_method) - self.discountamount
+                    return(f'Congrats! Your new price is {self.discountedprice:.2f} €. You have saved {self.price - self.discountedprice:.2f} €!')  
                 else :
-                    return("Sorry! That is an invalid discount. Your price remains the same")   
+                    return("Sorry! That is an invalid discount. Your price remains the same.")   
             else :
                 self.discountedprice = self.set_price(self._shipping_method)
-        return(f'Congrats! Your new price is {self.discountedprice:.2f}. You have saved {self.price - self.discountedprice:.2f}')    
-    # def set_discounting(self):
-    #     if self.set_price(self._shipping_method) < 20:
-    #         self.discountedprice = self.set_price(self._shipping_method)
-    #     elif self.discount == True : 
-    #         if self.type == "%":
-    #             if self.discountamount <10 :
-    #                 self.discountedprice = self.set_price(self._shipping_method)*(1 - self.discountamount/100)
-    #             else :
-    #                 return("Sorry! That is an invalid discount!")
-    #         elif self.type =="flat":
-    #             if self.discountamount <5 :
-    #                 self.discountedprice = self.set_price(self._shipping_method) - self.discountamount
-    #             else :
-    #                 return("Sorry! That is an invalid discount!")   
-    #         return(f'Congrats! Your new price is {self.discountedprice:.2f}. You have saved {self.price - self.discountedprice:.2f}')
-    #     else :
-    #         self.discountedprice = self.set_price(self._shipping_method) 
-    #         return(f'Your price is {self.discountedprice:.2f}. You have not chosen a discount!')  
-        
-        
-            
+                return(f'Your  price remains the same at {self.discountedprice:.2f} €.')    
   
     def final_price(self):
         self.price = self.set_discounting()
         
 """import from user menu"""
 if __name__ == '__main__':
-    user = Discount(False, "%",5,5,'Priority',2,2,0,0)
+    user = Discount(True, "%",5,5,'Priority',2,2,21,0)
     print(user.set_discounting())
 
 
