@@ -619,6 +619,7 @@ def customer_menu(customer):
             print_bars()
             print(f'{customer.get_username()} does not have any gift-cards/payment-cards')
         for card in paymentcards:
+            
             print(card)
         customer_menu(customer)
         

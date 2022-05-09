@@ -12,33 +12,33 @@ class Customers:
     '''
 
     def __init__(self, firstname, surname, username, user_id, password):
-        self.firstname = firstname
-        self.surname = surname
-        self.username = username
-        self.password = password
-        self.user_id = user_id
+        self.__firstname = firstname
+        self.__surname = surname
+        self.__username = username
+        self.__password = password
+        self.__user_id = user_id
 
     def __str__(self):
         bars = '----------------------------------------------------------------------------------------\n'
-        summary_message = bars + f'User details:\nUser ID     : {self.user_id}\nUsername    : {self.username}\nFirst name  : {self.firstname}\nSurname     : {self.surname}'
+        summary_message = bars + f'User details:\nUser ID     : {self.__user_id}\nUsername    : {self.__username}\nFirst name  : {self.__firstname}\nSurname     : {self.__surname}'
         return summary_message
 
     def get_firstname(self):
-        return self.firstname
+        return self.__firstname
 
     def get_surname(self):
-        return self.surname
+        return self.__surname
     
     def get_username(self):
-        return self.username
+        return self.__username
 
     def get_password(self):
-        return self.password
+        return self.__password
 
     def get_userid(self):
-        return self.user_id
+        return self.__user_id
     
     def get_detailslist(self):
-        return [self.user_id, self.firstname, self.surname, self.username, self.password]
+        return [self.__user_id, self.__firstname, self.__surname, self.__username, self.__password]
 
 

@@ -21,27 +21,27 @@ class PaymentCards(Customers.Customers):
 
     def __init__(self, firstname, surname, username, user_id, password, card_number = 0, expiry_date = '', card_balance = 0):
         super().__init__(firstname, surname, username, user_id, password)
-        self.card_number = card_number
-        self.expiry_date = expiry_date
-        self.card_balance = card_balance
+        self.__card_number = card_number
+        self.__expiry_date = expiry_date
+        self.__card_balance = card_balance
 
 
     def __str__(self):
         bars = '----------------------------------------------------------------------------------------\n'
-        summary_message = bars + f'User details:\nUser ID     : {self.user_id}\nUsername    : {self.username}\nFirst name  : {self.firstname}\nSurname     : {self.surname}\nCard number : {self.card_number}\nExpiry date : {self.expiry_date}\nCard balance: {self.card_balance}'
+        summary_message = bars + f'User details:\nUser ID     : {self.__user_id}\nUsername    : {self.__username}\nFirst name  : {self.__firstname}\nSurname     : {self.__surname}\nCard number : {self.__card_number}\nExpiry date : {self.__expiry_date}\nCard balance: {self.__card_balance}'
         return summary_message
 
 
     def set_card_number(self, number):
         if check_valid_number(number) == True:
-            self.card_number = number
+            self.__card_number = number
         else:
            return f'Card number provided not in a valid format: ####/####/####' 
 
 
     def set_expiry_date(self, date):
         if check_date_valid(date) == True:
-            self.expiry_date = date
+            self.__expiry_date = date
         else:
             return f'Date provided not in a valid format: dd/mm/yy'
 
@@ -55,26 +55,26 @@ class PaymentCards(Customers.Customers):
         if amount <= 0:
             return f'Expecting a positive number for the card balance'
         else:
-            self.card_balance = amount
+            self.__card_balance = amount
 
 
     def get_cardholder(self):
-        cardholder_name = self.firstname + ' ' + self.surname
+        cardholder_name = self.__firstname + ' ' + self.__surname
         return cardholder_name
 
 
     def get_card_number(self):
-        return self.card_number
+        return self.__card_number
 
     def get_card_balance(self):
-        return self.card_balance
+        return self.__card_balance
 
 
     def get_expiry_date(self):
-        return self.expiry_date
+        return self.__expiry_date
     
     def get_datetime_expiry(self):
-        date = self.expiry_date
+        date = self.__expiry_date
         day, month, year = date.split('/')
         return datetime(int(year), int(month), int(day))
 
@@ -84,16 +84,16 @@ class PaymentCards(Customers.Customers):
         remaining_cost = amount - self.card_balance
         if remaining_cost < 0:
             remaining_cost = 0
-        if amount <= self.card_balance:
-            self.card_balance -= amount
+        if amount <= self.__card_balance:
+            self.__card_balance -= amount
         else:
-            self.card_balance = 0
+            self.__card_balance = 0
         return remaining_cost
 
     def is_expired(self):
         # Card is expired and credited amounts are lost.
         today = datetime.now().date()
-        day, month, year = self.expiry_date.split('/')
+        day, month, year = self.__expiry_date.split('/')
         expiry = datetime(int(year), int(month), int(day)).date()
         if expiry > today:
             return 1
@@ -102,7 +102,7 @@ class PaymentCards(Customers.Customers):
             return 0
     
     def get_card_details(self):
-        return [self.username, self.card_number, self.expiry_date, self.card_balance]
+        return [self.__username, self.__card_number, self.__expiry_date, self.__card_balance]
 
 
 def check_date_valid(date):
