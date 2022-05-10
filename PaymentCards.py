@@ -28,7 +28,7 @@ class PaymentCards(Customers.Customers):
 
     def __str__(self):
         bars = '----------------------------------------------------------------------------------------\n'
-        summary_message = bars + f'User details:\nUser ID     : {self.__user_id}\nUsername    : {self.__username}\nFirst name  : {self.__firstname}\nSurname     : {self.__surname}\nCard number : {self.__card_number}\nExpiry date : {self.__expiry_date}\nCard balance: {self.__card_balance}'
+        summary_message = bars + f'User details:\nUser ID     : {self.user_id}\nUsername    : {self.username}\nFirst name  : {self.firstname}\nSurname     : {self.surname}\nCard number : {self.__card_number}\nExpiry date : {self.__expiry_date}\nCard balance: {self.__card_balance}'
         return summary_message
 
 
@@ -59,7 +59,7 @@ class PaymentCards(Customers.Customers):
 
 
     def get_cardholder(self):
-        cardholder_name = self.__firstname + ' ' + self.__surname
+        cardholder_name = self.firstname + ' ' + self.surname
         return cardholder_name
 
 
@@ -81,7 +81,7 @@ class PaymentCards(Customers.Customers):
 
     def withdraw(self, amount):
         # Cannot withdraw: amount is greater than balance
-        remaining_cost = amount - self.card_balance
+        remaining_cost = amount - self.__card_balance
         if remaining_cost < 0:
             remaining_cost = 0
         if amount <= self.__card_balance:
@@ -102,7 +102,7 @@ class PaymentCards(Customers.Customers):
             return 0
     
     def get_card_details(self):
-        return [self.__username, self.__card_number, self.__expiry_date, self.__card_balance]
+        return [self.username, self.__card_number, self.__expiry_date, self.__card_balance]
 
 
 def check_date_valid(date):

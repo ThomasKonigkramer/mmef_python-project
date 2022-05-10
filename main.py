@@ -635,7 +635,7 @@ def new_order(customer):
 
     print_bars()
     print('Requesting sender information:')
-    sender_details = Order.From()
+    sender_details = Order.Sender() 
 
     name = info_prompt_check("Sender's Full Name")
     while sender_details.set_name(name) != None:

@@ -12,33 +12,33 @@ class Customers:
     '''
 
     def __init__(self, firstname, surname, username, user_id, password):
-        self.__firstname = firstname
-        self.__surname = surname
-        self.__username = username
-        self.__password = password
-        self.__user_id = user_id
+        self.firstname = firstname
+        self.surname = surname
+        self.username = username
+        self.__password = password # the others need to be displayed outside the class - not this one
+        self.user_id = user_id
 
     def __str__(self):
         bars = '----------------------------------------------------------------------------------------\n'
-        summary_message = bars + f'User details:\nUser ID     : {self.__user_id}\nUsername    : {self.__username}\nFirst name  : {self.__firstname}\nSurname     : {self.__surname}'
+        summary_message = bars + f'User details:\nUser ID     : {self.user_id}\nUsername    : {self.username}\nFirst name  : {self.firstname}\nSurname     : {self.surname}'
         return summary_message
 
     def get_firstname(self):
-        return self.__firstname
+        return self.firstname
 
     def get_surname(self):
-        return self.__surname
+        return self.surname
     
     def get_username(self):
-        return self.__username
+        return self.username
 
     def get_password(self):
         return self.__password
 
     def get_userid(self):
-        return self.__user_id
+        return self.user_id
     
     def get_detailslist(self):
-        return [self.__user_id, self.__firstname, self.__surname, self.__username, self.__password]
+        return [self.user_id, self.firstname, self.surname, self.username, self.__password]
 
 

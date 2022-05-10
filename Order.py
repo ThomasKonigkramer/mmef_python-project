@@ -4,9 +4,12 @@
 # # Demand analysis to get the price throuth the address and size
 # #first to get the distance of the delivery
 
-# print('where are you shipping from:')
+
 import time
+
+
 class Sender:
+    '''class to sender's details'''
 
     def __init__(self, name = '', country = '', phonenumber = 0000000000, city = '-', address= '-', code='-'):
         self.name = name
@@ -16,44 +19,55 @@ class Sender:
         self.address = address
         self.code = code
     
+
     def __str__(self):
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country: {self.country}, city: {self.city}, ' \
                f'Address: {self.address}, Code: {self.code}'
-    # changed to set
+    
+
     def set_name(self, name):
         if len(name) == 0:
             return "Please enter the sender's full name"
         else:
             self.name = name
 
-    # edit: changed name and parameters        
+           
     def set_country(self, country):
-        country = country.upper() # added
+        country = country.upper() 
         if country == 'FRANCE':
             self.country = country
         else:
             return 'We currently only support orders sent from France.'
 
+
     def get_country(self):
         return self.country
+
 
     def get_name(self):
         return self.name
 
-    def set_city(self):
-        return self.city
-    def set_address(self, address):
-        return self.address
-    def set_code(self,code):
-        return self.code
 
-    def set_phonenumber(self):
+    def set_city(self, city):
+        self.city = city
+
+
+    def set_address(self, address):
+        self.address = address
+
+
+    def set_code(self,code):
+        self.code = code
+
+    def set_phonenumber(self, phonenumber):
         if len(self.phonenumber) == 10:
-            return self.phonenumber
+            self.phonenumber = phonenumber
         else:
-            return False
+            return 'Please enter a phone number'
 
 class Destination:
+    '''class to handle destination information'''
+
     def __init__(self, name = '', country = '', phonenumber = 0000000000, city = '-', address= '-', code='-'):
         self.name = name
         self.phonenumber = phonenumber
@@ -62,21 +76,37 @@ class Destination:
         self.address = address
         self.code = code
 
+
     def __str__(self):
         return f'Name: {self.name}, phonenumber: {self.phonenumber}, country: {self.country}, city: {self.city}, ' \
                f'Address: {self.address}, Code: {self.code}'
 
-    # def name(self):
-    #      while len(self.name) == 0:
-    #          return self.name
-    #      if len(self.name) != 0:
-    #          return False
 
     def set_name(self, name):
         if len(name) == 0:
             return "Please enter the sender's full name"
         else:
             self.name = name
+
+
+    def set_phonenumber(self, phonenumber):
+        if len(self.phonenumber) == 10:
+            self.phonenumber = phonenumber
+        else:
+            return 'Please enter a phone number'
+
+    
+    def set_city(self, city):
+        self.city = city
+
+
+    def set_address(self, address):
+        self.address = address
+
+
+    def set_code(self,code):
+        self.code = code
+
 
     def set_country(self, country):
         zone1 = ['FRANCE']
@@ -138,12 +168,6 @@ class Destination:
             return 'We do not recognise this destination country - please try again.'
 
 
-    def phonenumber(self):
-         while len(self.phonenumber) != 10:
-             return False
-         if len(self.phonenumber) == 10:
-            return self.phonenumber
-    #check if this is ok, what is getting returned? change this to 
     def get_country_zone(self, country):
         zone1 = ['FRANCE']
         zone2 = ['AUSTRIA', 'BELGIUM', 'BULGARIA', 'CROATIA', 'REPUBLIC OF CYPRUS', 'CZECH REPUBLIC', 'DENMARK', 'ESTONIA', 'FINLAND', 'GERMANY', 'GREECE', 'HUNGARY', 'IRELAND', 'ITALY', 'LATVIA', 'LITHUANIA', 'LUXEMBOURG', 'MALTA', 'NETHERLANDS', 'POLAND', 'PORTUGAL', 'ROMANIA', 'SLOVAKIA', 'SLOVENIA', 'SPAIN', 'SWEDEN']        
@@ -206,34 +230,20 @@ class Destination:
     def get_country(self):
         return self.country
         
-    def set_city(self):
-        return self.city
 
-    def set_address(self, address):
-        return self.address
-
-    def set_code(self, code):
-            return self.code
 
 class Package:
+    '''class to handle package information'''
+
     def __init__(self, package_size = 0, shipping_method = 1):
         self._package_size = package_size
         self._shipping_method = shipping_method
 
+
     def __str__(self):
         return f'the package_size is {self._package_size}, the service is {self._shipping_method}'
 
-    # def package_size(self):
-    #     if self._package_size <= 3:
-    #         return ('small')
-    #     elif self._package_size > 3 and self._package_size <= 10:
-    #         return ('medium')
-    #     elif self._package_size >= 10 and self._package_size <=20:
-    #         return ('big')
-    #     elif self._package_size >= 20:
-    #         return ('Sorry! It is too big for us to deliver!')
 
-    # added this
     def set_package_size(self, weight):
         try:
             int(weight)
@@ -247,15 +257,17 @@ class Package:
         else:
             self._package_size = int(weight)
     
+
     def get_package_size(self):
         return self._package_size
 
-    # added this
+    
     def set_shipping_method(self, method):
         if method in [1,2,3]:
             self._shipping_method = method
         else:
             return 'Not a valid option'
+
 
     def get_package_size_category(self):
         if self._package_size <= 3:
@@ -267,9 +279,9 @@ class Package:
         elif self._package_size >= 20:
             return ('Sorry! It is too big for us to deliver!')
             
-    #perhaps change to names directly
+    # perhaps change to names directly
     def get_shipping_method_category(self):
-        if self._shipping_method== 1:
+        if self._shipping_method == 1:
             return 'Priority'
         elif self._shipping_method == 2:
             return 'Express'
@@ -281,6 +293,7 @@ class Package:
         return self._shipping_method
 
 class Order:
+    '''class to handle order information'''
 
     def __init__(self, customer, price, date, delivery_preference = 0, tracking_id = 0):
         self.__customer = customer
@@ -289,39 +302,48 @@ class Order:
         self.__delivery_preference = delivery_preference
         self.__tracking_id = tracking_id
 
+
     def get_delivery_preference(self):
         return self.__delivery_preference
 
+
     def set_delivery_preference(self, preference):
         if preference == 1: # home delivery (0 default for depot delivery)
+            # print(self.__price)
             self.__price += 2
         self.__delivery_preference = preference
+
 
     def get_customer(self):
         return self.__customer
 
+
     def get_price(self):
         return self.__price
     
+
     def get_date(self):
         return self.__date
 
+
     def get_tracking_id(self):
         return self.__tracking_id
+
 
     def set_order_code(self):
         #year/month/date/hour/minute/second+time.time and 7 more
         order_no = str(time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())) + str(time.time()).replace('.', '')[-7:])
         self.__tracking_id = order_no
 
+
     def get_order_code(self):
         return self.__tracking_id
+
 
     def get_order_details_list(self):
         username = self.__customer.get_username()
         return [username, self.__price, self.__date, self.__delivery_preference, self.__tracking_id]
 
-    # def get_delivery_date(self):
 
     def __str__(self):
         return f'Your order has been completed. Tracking number: {self.__tracking_id}'
